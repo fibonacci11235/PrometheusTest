@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="540.0" prefWidth="770.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="prometheustest.DashboardController">
+   <children>
+      <SplitPane prefHeight="540.0" prefWidth="144.0">
+         <items>
+            <AnchorPane prefHeight="556.0" prefWidth="142.0">
+               <children>
+                  <Button fx:id="backButton" layoutX="8.0" layoutY="499.0" mnemonicParsing="false" onAction="#backPressed" text="Back to landing page" />
+                  <ListView fx:id="subjectList" layoutX="14.0" layoutY="52.0" prefHeight="380.0" prefWidth="115.0" />
+                  <Label layoutX="21.0" layoutY="14.0" text="Filter" />
+               </children>
+            </AnchorPane>
+         </items>
+      </SplitPane>
+      <Label fx:id="courseTitle" layoutX="163.0" layoutY="22.0" text="&lt;Program name&gt;">
+         <font>
+            <Font size="21.0" />
+         </font></Label>
+      <Label layoutX="279.0" layoutY="107.0" text="Trimester 1" />
+      <Label layoutX="458.0" layoutY="107.0" text="Trimester 2" />
+      <Label layoutX="640.0" layoutY="107.0" text="Trimester 3" />
+      <Label fx:id="startYear" layoutX="163.0" layoutY="176.0" text="&lt;startYear&gt;" />
+      <ListView fx:id="trimester1" layoutX="233.0" layoutY="134.0" prefHeight="101.0" prefWidth="152.0" />
+      <ListView fx:id="trimester2" layoutX="412.0" layoutY="134.0" prefHeight="101.0" prefWidth="152.0" />
+      <ListView fx:id="trimester3" layoutX="594.0" layoutY="134.0" prefHeight="101.0" prefWidth="152.0" />
+      <ListView fx:id="trimester4" layoutX="233.0" layoutY="256.0" prefHeight="101.0" prefWidth="152.0" />
+      <ListView fx:id="trimester5" layoutX="412.0" layoutY="256.0" prefHeight="101.0" prefWidth="152.0" />
+      <ListView fx:id="trimester6" layoutX="594.0" layoutY="256.0" prefHeight="101.0" prefWidth="152.0" />
+      <ListView fx:id="trimester7" layoutX="233.0" layoutY="376.0" prefHeight="101.0" prefWidth="152.0" />
+      <ListView fx:id="trimester8" layoutX="412.0" layoutY="376.0" prefHeight="101.0" prefWidth="152.0" />
+      <ListView fx:id="trimester9" layoutX="594.0" layoutY="376.0" prefHeight="101.0" prefWidth="152.0" />
+      <Label fx:id="secondYear" layoutX="163.0" layoutY="298.0" text="&lt;secondYear&gt;" />
+      <Label fx:id="thirdYear" layoutX="163.0" layoutY="418.0" text="&lt;thirdYear&gt;" />
+      <TextField fx:id="alertField" editable="false" layoutX="167.0" layoutY="494.0" prefHeight="25.0" prefWidth="581.0" text="Alert Field" />
+   </children>
+</AnchorPane>

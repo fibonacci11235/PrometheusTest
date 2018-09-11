@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="prometheustest.LandingController">
+   <center>
+      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+         <children>
+            <ComboBox fx:id="comboBox1" prefHeight="25.0" prefWidth="302.0" promptText="Program code" />
+            <ComboBox fx:id="comboBox2" prefHeight="25.0" prefWidth="303.0" promptText="Year of commencement">
+               <VBox.margin>
+                  <Insets top="20.0" />
+               </VBox.margin>
+            </ComboBox>
+            <ComboBox fx:id="comboBox3" prefHeight="25.0" prefWidth="300.0" promptText="Expected year of completion">
+               <VBox.margin>
+                  <Insets top="20.0" />
+               </VBox.margin>
+            </ComboBox>
+            <Button fx:id="submit" mnemonicParsing="false" onAction="#submitPressed" text="Submit">
+               <VBox.margin>
+                  <Insets left="125.0" top="20.0" />
+               </VBox.margin>
+            </Button>
+         </children>
+         <BorderPane.margin>
+            <Insets bottom="100.0" left="150.0" right="150.0" top="100.0" />
+         </BorderPane.margin>
+      </VBox>
+   </center>
+   <top>
+      <Label text="Prometheus Test" textAlignment="CENTER" BorderPane.alignment="CENTER">
+         <font>
+            <Font size="29.0" />
+         </font>
+         <BorderPane.margin>
+            <Insets top="50.0" />
+         </BorderPane.margin>
+      </Label>
+   </top>
+</BorderPane>
