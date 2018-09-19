@@ -11,14 +11,14 @@ package prometheustest;
  */
 public class UserProfile {
     
-    private String course;
+    private String course = "";
     private int startingYear;
-    private int completionYear;
+    private String duration;
     
-    public UserProfile(String course, int startingYear, int completionYear) {
+    public UserProfile(String course, int startingYear, String duration) {
         this.course = course;
         this.startingYear = startingYear;
-        this.completionYear = completionYear;
+        this.duration = duration;
     }
 
     public String getCourse() {
@@ -37,13 +37,14 @@ public class UserProfile {
         this.startingYear = startingYear;
     }
 
-    public int getCompletionYear() {
-        return completionYear;
+    public String getDuration() {
+        return duration;
     }
 
-    public void setCompletionYear(int completionYear) {
-        this.completionYear = completionYear;
+    public void setDuration(String duration) {
+        this.duration = duration;
     }
     
+
     
 }

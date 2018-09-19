@@ -8,14 +8,15 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="540.0" prefWidth="770.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="prometheustest.DashboardController">
+<AnchorPane id="AnchorPane" prefHeight="540.0" prefWidth="770.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="prometheustest.Dashboard1Controller">
    <children>
       <SplitPane prefHeight="540.0" prefWidth="144.0">
          <items>
-            <AnchorPane prefHeight="556.0" prefWidth="141.0">
+            <AnchorPane prefHeight="556.0" prefWidth="142.0">
                <children>
                   <Button fx:id="backButton" layoutX="8.0" layoutY="499.0" mnemonicParsing="false" onAction="#backPressed" text="Back to landing page" />
-                  <ListView fx:id="subjectList" layoutX="14.0" layoutY="52.0" prefHeight="380.0" prefWidth="115.0" />
+                  <ListView fx:id="subjectList" layoutX="14.0" layoutY="52.0" prefHeight="380.0" prefWidth="115.0">
+                     </ListView>
                   <Label layoutX="21.0" layoutY="14.0" text="Filter" />
                </children>
             </AnchorPane>
@@ -41,5 +42,7 @@
       <Label fx:id="secondYear" layoutX="163.0" layoutY="298.0" text="&lt;secondYear&gt;" />
       <Label fx:id="thirdYear" layoutX="163.0" layoutY="418.0" text="&lt;thirdYear&gt;" />
       <TextField fx:id="alertField" editable="false" layoutX="167.0" layoutY="494.0" prefHeight="25.0" prefWidth="581.0" text="Alert Field" />
+      <Button fx:id="recommend" layoutX="165.0" layoutY="70.0" mnemonicParsing="false" onAction="#recommendedPressed" text="Recommend plan" />
+      <Button fx:id="clear" layoutX="294.0" layoutY="70.0" mnemonicParsing="false" onAction="#clearTrimesters" text="Clear plan" />
    </children>
 </AnchorPane>
