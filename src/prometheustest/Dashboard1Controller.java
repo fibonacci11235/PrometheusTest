@@ -7,7 +7,10 @@ package prometheustest;
 
 
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -25,16 +28,17 @@ public class Dashboard1Controller extends ParentDashboardController {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        //subjectList.getItems().addAll("INFS1602", "INFS1603", "INFS1609", "ACCT1501");
-        
-        
+       
+            //subjectList.getItems().addAll("INFS1602", "INFS1603", "INFS1609", "ACCT1501");
+
+            
        
         
         //Assigns Drag and Drop functionality to trimester containers
         super.establishHandlers();
         
         establishToolTip();
-             
+        progressionWheelArrays();     
     }  
     
    

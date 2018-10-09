@@ -12,6 +12,7 @@ package prometheustest;
 
 
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -37,10 +38,11 @@ public class Dashboard2Controller extends ParentDashboardController {
         super.establishHandlers();
         super.dashboard2Handlers();
         establishToolTip();
+        establishToolTip2();
     }
    
     @Override
-    public void initData(UserProfile profile){
+    public void initData(UserProfile profile) throws ClassNotFoundException, SQLException{
         currentUser = profile;
         courseTitle.setText(currentUser.getCourse());
         startYear.setText(Integer.toString(currentUser.getStartingYear()));
@@ -52,7 +54,7 @@ public class Dashboard2Controller extends ParentDashboardController {
     
     @FXML
     @Override
-    public void clearTrimesters() {
+    public void clearTrimesters() throws ClassNotFoundException, SQLException {
        subjectList.getItems().clear();
        trimester1.getItems().clear();
        trimester2.getItems().clear();

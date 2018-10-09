@@ -7,10 +7,17 @@ package prometheustest;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -24,6 +31,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
@@ -97,7 +106,54 @@ public abstract class ParentDashboardController implements Initializable {
     
     static final DataFormat SUBJECT_LIST = new DataFormat("SubjectList");
     
+    
+    
+    private String trimesterOffering;
+    private String subjectOffered;
+    
+    
+    
+    private String sql = "SELECT * FROM COURSE ORDER BY COURSE_CODE";
+    @FXML
+    public TextField courseSearch;
+    @FXML
+    public Button courseSearchButton;
+    
+    // Progress bar
+    @FXML
+    public Label totalUnitLabel;
+    private int tempUnits;
+    private int totalUnits = 0;
+    
+    @FXML
+    public ProgressBar unitProgressBar;
+    
+    //Temporary Variables 
+    List<String> temporaryList = new ArrayList<>();
+    public String tempSubject;
     private int dragUnits;
+    public String tempPrerequisites;
+    public String listViewSource;
+    
+    //ProgressionWheelArrays
+    List<String> businessCores = new ArrayList<>();
+    List<String> informationSystemsCores = new ArrayList<>();
+    List<String> prescribedElectives = new ArrayList<>();
+    @FXML
+    public Label businessCoresLabel;
+    @FXML
+    public Label ISCoresLabel;
+    @FXML
+    public Label prescribedElectivesLabel;
+    private int businessCoresUnits = 0;
+    private int ISCoresUnits = 0;
+    private int prescribedElectivesUnits = 0; 
+    @FXML
+    public ProgressIndicator businessCoreProgress;
+    @FXML
+    public ProgressIndicator ISCoreProgress;
+    @FXML
+    public ProgressIndicator prescribedElectiveProgress;
     
     //Subjects
     private Subject INFS1602 = new Subject("INFS1602", 6, "Digital Transformation in Business", "", "T1, T2, T3");
@@ -177,7 +233,7 @@ public abstract class ParentDashboardController implements Initializable {
     }
     
     
-    public void initData(UserProfile profile){
+    public void initData(UserProfile profile) throws ClassNotFoundException, SQLException{
         currentUser = profile;
         courseTitle.setText(currentUser.getCourse());
         startYear.setText(Integer.toString(currentUser.getStartingYear()));
@@ -187,42 +243,38 @@ public abstract class ParentDashboardController implements Initializable {
     }
         
      
-    public void establishList() {
+    public void establishList() throws ClassNotFoundException, SQLException {
         subjectList.getItems().addAll(this.getSubjectList());
     }
     
-    private ObservableList<Subject> getSubjectList() {
-        ObservableList<Subject> list = FXCollections.observableArrayList();
+    private ObservableList<Subject> getSubjectList() throws ClassNotFoundException, SQLException {
         
-        /*Subject INFS1602 = new Subject("INFS1602");
-        Subject INFS1603 = new Subject("INFS1603");
-        Subject INFS1609 = new Subject("INFS1609");
-        Subject ACCT1501 = new Subject("ACCT1501");
-        Subject MGMT1001 = new Subject("MGMT1001");
-        Subject ECON1101 = new Subject("ECON1101");
-        Subject ECON1203 = new Subject("ECON1203");*/
-        if ("3979 - Information Systems".equals(currentUser.getCourse())) {
-            list.addAll(INFS1602, INFS1603, INFS1609, ACCT1501, MGMT1001, ECON1101, 
-                        ECON1203, INFS2603, INFS2605, INFS2608, ACCT1511, INFS2621,
-                        INFS3603, INFS3617, INFS2631, INFS3020, INFS3632, INFS3604,
-                        INFS3873, INFS3634, INFS3830, INFS3605);
-        }
-        else if ("3584 - Commerce / Information Systems".equals(currentUser.getCourse())) {
-            list.addAll(INFS1602, INFS1603, INFS1609, ACCT1501, MGMT1001, ECON1101, 
-                        ECON1203, INFS2603, INFS2605, INFS2608, ACCT1511, INFS2621,
-                        INFS3603, INFS3617, INFS2631, INFS3020, INFS3632, INFS3604,
-                        INFS3873, INFS3634, INFS3830, INFS3605, COMM1000, ECON1102,
-                        FINS1613, MARK1012, MGMT1101, TABL1710); 
-         }
-        else if ("3964 - BIS (Co-op)".equals(currentUser.getCourse())) {
-             list.addAll(INFS1602, INFS1603, INFS1609, ACCT1501, MGMT1001, ECON1101, 
-                        ECON1203, INFS2603, INFS2605, INFS2608, ACCT1511, INFS2621,
-                        INFS3603, INFS3617, INFS2631, INFS3020, INFS3632, INFS3604,
-                        INFS3873, INFS3634, INFS3830, INFS3605, INFS2101, INFS3202,
-                        INFS3303, INFS4800, INFS4801, INFS4802, INFS4886, INFS4887,
-                        INFS4831, INFS4858, INFS4907);
-         }
+        ObservableList<Subject> list = FXCollections.observableArrayList(loadCourseDB());
         
+        
+//        if ("3979 - Information Systems".equals(currentUser.getCourse())) {
+//            list.addAll(INFS1602, INFS1603, INFS1609, ACCT1501, MGMT1001, ECON1101, 
+//                        ECON12037, INFS2603, INFS2605, INFS2608, ACCT1511, INFS2621,
+//                        INFS3603, INFS361, INFS2631, INFS3020, INFS3632, INFS3604,
+//                        INFS3873, INFS3634, INFS3830, INFS3605);
+//        }
+//        else if ("3584 - Commerce / Information Systems".equals(currentUser.getCourse())) {
+//            list.addAll(INFS1602, INFS1603, INFS1609, ACCT1501, MGMT1001, ECON1101, 
+//                        ECON1203, INFS2603, INFS2605, INFS2608, ACCT1511, INFS2621,
+//                        INFS3603, INFS3617, INFS2631, INFS3020, INFS3632, INFS3604,
+//                        INFS3873, INFS3634, INFS3830, INFS3605, COMM1000, ECON1102,
+//                        FINS1613, MARK1012, MGMT1101, TABL1710); 
+//         }
+//        else if ("3964 - BIS (Co-op)".equals(currentUser.getCourse())) {
+//             list.addAll(INFS1602, INFS1603, INFS1609, ACCT1501, MGMT1001, ECON1101, 
+//                        ECON1203, INFS2603, INFS2605, INFS2608, ACCT1511, INFS2621,
+//                        INFS3603, INFS3617, INFS2631, INFS3020, INFS3632, INFS3604,
+//                        INFS3873, INFS3634, INFS3830, INFS3605, INFS2101, INFS3202,
+//                        INFS3303, INFS4800, INFS4801, INFS4802, INFS4886, INFS4887,
+//                        INFS4831, INFS4858, INFS4907);
+//         }
+        
+                        
         return list;
     }
       
@@ -236,7 +288,19 @@ public abstract class ParentDashboardController implements Initializable {
             return;
         }
         Subject subject = listView.getSelectionModel().getSelectedItem();
+        if (listView == subjectList) {
+            tempUnits = subject.getSubjectUnits();
+            tempSubject = subject.getSubjectCode(); 
+            tempPrerequisites = subject.getPrerequisites();
+            listViewSource = "subjectList";
+        }
+        else {
+            listViewSource = "trimester";
+        }
+        subjectOffered = subject.getSubjectCode();
         dragUnits = subject.getSubjectUnits();
+        trimesterOffering = subject.getOffering();
+        
         
         Dragboard dragboard = listView.startDragAndDrop(TransferMode.COPY_OR_MOVE);
         
@@ -263,15 +327,29 @@ public abstract class ParentDashboardController implements Initializable {
         Dragboard dragboard = event.getDragboard();
         if (listView != subjectList && sumUnits(listView) > 18) {
             alert("Adding subject will exceed trimester load.");
+            listView.getSelectionModel().clearSelection();
+            subjectList.getSelectionModel().clearSelection();
+            dragCompleted = false;
+        }
+        else if (listView == subjectList) {
+            dragCompleted = false;
+        }
+        else if (temporaryList.contains(tempSubject)) {
+            alert("Subject already contained within plan.");
             dragCompleted = false;
         }
         else {
-            if(dragboard.hasContent(SUBJECT_LIST)) {
+            if(dragboard.hasContent(SUBJECT_LIST) && trimesterOfferingCheck(listView)) {
                 ArrayList<Subject> list = (ArrayList<Subject>)dragboard.getContent(SUBJECT_LIST);
                 listView.getItems().addAll(list);
+                totalUnitTracker();
+                progressionWheelIncrement();
                 alert(" ");
                 dragCompleted = true;            
-            }   
+            } 
+            else {
+                dragCompleted = false;
+            }
         }
         
         
@@ -283,6 +361,12 @@ public abstract class ParentDashboardController implements Initializable {
         TransferMode tm = event.getTransferMode();
         if (tm == TransferMode.MOVE) {
             removeSelectedSubjects(listView);
+            if (tempSubject != null) {
+                temporaryList.add(tempSubject); //Adds chosen subject to a temporary arraylist
+                System.out.println(tempPrerequisites);
+                tempSubject = null;
+                tempPrerequisites = null;
+            }
         }
         event.consume();
     }
@@ -523,7 +607,7 @@ public abstract class ParentDashboardController implements Initializable {
    }
    
    @FXML
-   public void recommendedPressed() {
+   public void recommendedPressed() throws ClassNotFoundException, SQLException {
         if ("3979 - Information Systems".equals(currentUser.getCourse())) {
             clearTrimesters();
             subjectList.getItems().removeAll(INFS1602, INFS1603, INFS1609,
@@ -552,7 +636,7 @@ public abstract class ParentDashboardController implements Initializable {
    }
    
    @FXML
-   public void clearTrimesters() {
+   public void clearTrimesters() throws ClassNotFoundException, SQLException {
        subjectList.getItems().clear();
        trimester1.getItems().clear();
        trimester2.getItems().clear();
@@ -563,6 +647,22 @@ public abstract class ParentDashboardController implements Initializable {
        trimester7.getItems().clear();
        trimester8.getItems().clear();
        trimester9.getItems().clear();
+       totalUnits = 0;
+       totalUnitLabel.setText(Integer.toString(totalUnits));
+       unitProgressBar.setProgress(0);
+       temporaryList.clear();
+       
+       businessCoresUnits = 0;
+       ISCoresUnits = 0;
+       prescribedElectivesUnits = 0; 
+       
+       businessCoresLabel.setText(Integer.toString(businessCoresUnits));
+       ISCoresLabel.setText(Integer.toString(ISCoresUnits));
+       prescribedElectivesLabel.setText(Integer.toString(prescribedElectivesUnits));
+       
+       businessCoreProgress.setProgress(0);
+       ISCoreProgress.setProgress(0);
+       prescribedElectiveProgress.setProgress(0);
        establishList();
    }
    
@@ -575,6 +675,110 @@ public abstract class ParentDashboardController implements Initializable {
        }
     return total+dragUnits;
    }
+   
+   public void totalUnitTracker() {
+       
+       totalUnits += tempUnits;
+       totalUnitLabel.setText(Integer.toString(totalUnits));
+       double x = (double) totalUnits;
+       double progress = x/144;
+       unitProgressBar.setProgress(progress);
+       tempUnits = 0;
+   }
+   
+   public boolean trimesterOfferingCheck(ListView<Subject> listView) {
+       
+       if (Arrays.asList(trimester1, trimester4, trimester7, trimester10, trimester13).contains(listView) && trimesterOffering.contains("Term 1")){
+           return true;
+       }
+       else if (Arrays.asList(trimester2, trimester5, trimester8, trimester11, trimester14).contains(listView) && trimesterOffering.contains("Term 2")) {
+           return true;
+       }
+       else if (Arrays.asList(trimester3, trimester6, trimester9, trimester12, trimester15).contains(listView) && trimesterOffering.contains("Term 3")) {
+           return true;
+       }
+       else {
+           alert(subjectOffered+" not offered in chosen trimester. Term Offering: "+trimesterOffering);
+           listView.getSelectionModel().clearSelection();
+           subjectList.getSelectionModel().clearSelection();
+           return false;
+       }
+   }
+   
+   public boolean prerequisiteCheck() {
+       if ("INFS1602".equals(tempSubject)) {
+           System.out.println("trueeee");
+           return true;
+       }
+       else if ("INFS1603".equals(tempSubject)) {
+           return true;
+       }
+       else if ("INFS2603".equals(tempSubject) && temporaryList.contains("INFS1602") && temporaryList.contains("INFS1603")) {
+          return true; 
+       }
+       else {
+           System.out.println("It false yo");
+           return false;
+       }
+    
+   }
+   
+   public void progressionWheelArrays() {
+        
+        businessCores.add("ACCT1501");
+        businessCores.add("MGMT1001");
+        businessCores.add("ECON1203"); 
+        businessCores.add("MATH1041");
+        businessCores.add("ACCT1511");
+        businessCores.add("ECON1101"); 
+      
+        informationSystemsCores.add("INFS1602");
+        informationSystemsCores.add("INFS1603");
+        informationSystemsCores.add("INFS1609");
+        informationSystemsCores.add("INFS2603");
+        informationSystemsCores.add("INFS2605");
+        informationSystemsCores.add("INFS2608");
+        informationSystemsCores.add("INFS2621");
+        informationSystemsCores.add("INFS3603");
+        informationSystemsCores.add("INFS3604");
+        informationSystemsCores.add("INFS3605");
+        informationSystemsCores.add("INFS3617");
+        informationSystemsCores.add("INFS3634");
+        
+        prescribedElectives.add("INFS2631");
+        prescribedElectives.add("INFS3020");
+        prescribedElectives.add("INFS3632");
+        prescribedElectives.add("INFS3830");
+        prescribedElectives.add("INFS3873");
+   }
+   
+   public void progressionWheelIncrement() {
+       if (businessCores.contains(tempSubject)) {
+           businessCoresUnits += dragUnits;
+           businessCoresLabel.setText(Integer.toString(businessCoresUnits));
+           double x = (double) businessCoresUnits;
+           double progress = x/24;
+           businessCoreProgress.setProgress(progress);
+       }
+       else if (informationSystemsCores.contains(tempSubject)) {
+           ISCoresUnits += dragUnits;
+           ISCoresLabel.setText(Integer.toString(ISCoresUnits));
+           double x = (double) ISCoresUnits;
+           double progress = x/72;
+           ISCoreProgress.setProgress(progress);
+       }
+       else if (prescribedElectives.contains(tempSubject)) {
+           prescribedElectivesUnits += dragUnits;
+           prescribedElectivesLabel.setText(Integer.toString(prescribedElectivesUnits));
+           double x = (double) prescribedElectivesUnits;
+           double progress = x/12;
+           prescribedElectiveProgress.setProgress(progress);
+       }
+       else {
+           System.out.println("no");
+       }
+   }
+       
    
    public void establishToolTip() {
        subjectList.setCellFactory(new Callback<ListView<Subject>, ListCell<Subject>>() {
@@ -600,6 +804,408 @@ public abstract class ParentDashboardController implements Initializable {
                 return cell;
             }
         });
+       
+       trimester1.setCellFactory(new Callback<ListView<Subject>, ListCell<Subject>>() {
+            public ListCell<Subject> call(ListView<Subject> param) {
+                Tooltip tooltip = new Tooltip();
+                ListCell<Subject> cell = new ListCell<Subject>() {
+                    @Override
+                    public void updateItem(Subject item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(item.getSubjectCode());
+                            tooltip.setText(item.getSubjectName()+
+                                            "\nUnits of credit: "+item.getSubjectUnits()+
+                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nTrimester Offering: "+item.getOffering());
+                            setTooltip(tooltip);
+                        } else {
+                            setText("");
+                            setTooltip(null);
+                        }
+                    }
+                };
+                return cell;
+            }
+        });
+       
+       trimester2.setCellFactory(new Callback<ListView<Subject>, ListCell<Subject>>() {
+            public ListCell<Subject> call(ListView<Subject> param) {
+                Tooltip tooltip = new Tooltip();
+                ListCell<Subject> cell = new ListCell<Subject>() {
+                    @Override
+                    public void updateItem(Subject item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(item.getSubjectCode());
+                            tooltip.setText(item.getSubjectName()+
+                                            "\nUnits of credit: "+item.getSubjectUnits()+
+                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nTrimester Offering: "+item.getOffering());
+                            setTooltip(tooltip);
+                        } else {
+                            setText("");
+                            setTooltip(null);
+                        }
+                    }
+                };
+                return cell;
+            }
+        });
+       
+       trimester3.setCellFactory(new Callback<ListView<Subject>, ListCell<Subject>>() {
+            public ListCell<Subject> call(ListView<Subject> param) {
+                Tooltip tooltip = new Tooltip();
+                ListCell<Subject> cell = new ListCell<Subject>() {
+                    @Override
+                    public void updateItem(Subject item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(item.getSubjectCode());
+                            tooltip.setText(item.getSubjectName()+
+                                            "\nUnits of credit: "+item.getSubjectUnits()+
+                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nTrimester Offering: "+item.getOffering());
+                            setTooltip(tooltip);
+                        } else {
+                            setText("");
+                            setTooltip(null);
+                        }
+                    }
+                };
+                return cell;
+            }
+        });
+       
+       trimester4.setCellFactory(new Callback<ListView<Subject>, ListCell<Subject>>() {
+            public ListCell<Subject> call(ListView<Subject> param) {
+                Tooltip tooltip = new Tooltip();
+                ListCell<Subject> cell = new ListCell<Subject>() {
+                    @Override
+                    public void updateItem(Subject item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(item.getSubjectCode());
+                            tooltip.setText(item.getSubjectName()+
+                                            "\nUnits of credit: "+item.getSubjectUnits()+
+                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nTrimester Offering: "+item.getOffering());
+                            setTooltip(tooltip);
+                        } else {
+                            setText("");
+                            setTooltip(null);
+                        }
+                    }
+                };
+                return cell;
+            }
+        });
+       
+       trimester5.setCellFactory(new Callback<ListView<Subject>, ListCell<Subject>>() {
+            public ListCell<Subject> call(ListView<Subject> param) {
+                Tooltip tooltip = new Tooltip();
+                ListCell<Subject> cell = new ListCell<Subject>() {
+                    @Override
+                    public void updateItem(Subject item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(item.getSubjectCode());
+                            tooltip.setText(item.getSubjectName()+
+                                            "\nUnits of credit: "+item.getSubjectUnits()+
+                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nTrimester Offering: "+item.getOffering());
+                            setTooltip(tooltip);
+                        } else {
+                            setText("");
+                            setTooltip(null);
+                        }
+                    }
+                };
+                return cell;
+            }
+        });
+       
+       trimester6.setCellFactory(new Callback<ListView<Subject>, ListCell<Subject>>() {
+            public ListCell<Subject> call(ListView<Subject> param) {
+                Tooltip tooltip = new Tooltip();
+                ListCell<Subject> cell = new ListCell<Subject>() {
+                    @Override
+                    public void updateItem(Subject item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(item.getSubjectCode());
+                            tooltip.setText(item.getSubjectName()+
+                                            "\nUnits of credit: "+item.getSubjectUnits()+
+                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nTrimester Offering: "+item.getOffering());
+                            setTooltip(tooltip);
+                        } else {
+                            setText("");
+                            setTooltip(null);
+                        }
+                    }
+                };
+                return cell;
+            }
+        });
+       
+       trimester7.setCellFactory(new Callback<ListView<Subject>, ListCell<Subject>>() {
+            public ListCell<Subject> call(ListView<Subject> param) {
+                Tooltip tooltip = new Tooltip();
+                ListCell<Subject> cell = new ListCell<Subject>() {
+                    @Override
+                    public void updateItem(Subject item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(item.getSubjectCode());
+                            tooltip.setText(item.getSubjectName()+
+                                            "\nUnits of credit: "+item.getSubjectUnits()+
+                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nTrimester Offering: "+item.getOffering());
+                            setTooltip(tooltip);
+                        } else {
+                            setText("");
+                            setTooltip(null);
+                        }
+                    }
+                };
+                return cell;
+            }
+        });
+       
+       trimester8.setCellFactory(new Callback<ListView<Subject>, ListCell<Subject>>() {
+            public ListCell<Subject> call(ListView<Subject> param) {
+                Tooltip tooltip = new Tooltip();
+                ListCell<Subject> cell = new ListCell<Subject>() {
+                    @Override
+                    public void updateItem(Subject item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(item.getSubjectCode());
+                            tooltip.setText(item.getSubjectName()+
+                                            "\nUnits of credit: "+item.getSubjectUnits()+
+                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nTrimester Offering: "+item.getOffering());
+                            setTooltip(tooltip);
+                        } else {
+                            setText("");
+                            setTooltip(null);
+                        }
+                    }
+                };
+                return cell;
+            }
+        });
+       
+       trimester9.setCellFactory(new Callback<ListView<Subject>, ListCell<Subject>>() {
+            public ListCell<Subject> call(ListView<Subject> param) {
+                Tooltip tooltip = new Tooltip();
+                ListCell<Subject> cell = new ListCell<Subject>() {
+                    @Override
+                    public void updateItem(Subject item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(item.getSubjectCode());
+                            tooltip.setText(item.getSubjectName()+
+                                            "\nUnits of credit: "+item.getSubjectUnits()+
+                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nTrimester Offering: "+item.getOffering());
+                            setTooltip(tooltip);
+                        } else {
+                            setText("");
+                            setTooltip(null);
+                        }
+                    }
+                };
+                return cell;
+            }
+        });
+       
+   }
+   
+   public void establishToolTip2() {
+       
+       trimester10.setCellFactory(new Callback<ListView<Subject>, ListCell<Subject>>() {
+            public ListCell<Subject> call(ListView<Subject> param) {
+                Tooltip tooltip = new Tooltip();
+                ListCell<Subject> cell = new ListCell<Subject>() {
+                    @Override
+                    public void updateItem(Subject item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(item.getSubjectCode());
+                            tooltip.setText(item.getSubjectName()+
+                                            "\nUnits of credit: "+item.getSubjectUnits()+
+                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nTrimester Offering: "+item.getOffering());
+                            setTooltip(tooltip);
+                        } else {
+                            setText("");
+                            setTooltip(null);
+                        }
+                    }
+                };
+                return cell;
+            }
+        });
+       
+       trimester11.setCellFactory(new Callback<ListView<Subject>, ListCell<Subject>>() {
+            public ListCell<Subject> call(ListView<Subject> param) {
+                Tooltip tooltip = new Tooltip();
+                ListCell<Subject> cell = new ListCell<Subject>() {
+                    @Override
+                    public void updateItem(Subject item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(item.getSubjectCode());
+                            tooltip.setText(item.getSubjectName()+
+                                            "\nUnits of credit: "+item.getSubjectUnits()+
+                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nTrimester Offering: "+item.getOffering());
+                            setTooltip(tooltip);
+                        } else {
+                            setText("");
+                            setTooltip(null);
+                        }
+                    }
+                };
+                return cell;
+            }
+        });
+       
+       trimester12.setCellFactory(new Callback<ListView<Subject>, ListCell<Subject>>() {
+            public ListCell<Subject> call(ListView<Subject> param) {
+                Tooltip tooltip = new Tooltip();
+                ListCell<Subject> cell = new ListCell<Subject>() {
+                    @Override
+                    public void updateItem(Subject item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(item.getSubjectCode());
+                            tooltip.setText(item.getSubjectName()+
+                                            "\nUnits of credit: "+item.getSubjectUnits()+
+                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nTrimester Offering: "+item.getOffering());
+                            setTooltip(tooltip);
+                        } else {
+                            setText("");
+                            setTooltip(null);
+                        }
+                    }
+                };
+                return cell;
+            }
+        });
+   }
+   
+   public void establishToolTip3() {
+       
+       trimester13.setCellFactory(new Callback<ListView<Subject>, ListCell<Subject>>() {
+            public ListCell<Subject> call(ListView<Subject> param) {
+                Tooltip tooltip = new Tooltip();
+                ListCell<Subject> cell = new ListCell<Subject>() {
+                    @Override
+                    public void updateItem(Subject item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(item.getSubjectCode());
+                            tooltip.setText(item.getSubjectName()+
+                                            "\nUnits of credit: "+item.getSubjectUnits()+
+                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nTrimester Offering: "+item.getOffering());
+                            setTooltip(tooltip);
+                        } else {
+                            setText("");
+                            setTooltip(null);
+                        }
+                    }
+                };
+                return cell;
+            }
+        });
+       
+       trimester14.setCellFactory(new Callback<ListView<Subject>, ListCell<Subject>>() {
+            public ListCell<Subject> call(ListView<Subject> param) {
+                Tooltip tooltip = new Tooltip();
+                ListCell<Subject> cell = new ListCell<Subject>() {
+                    @Override
+                    public void updateItem(Subject item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(item.getSubjectCode());
+                            tooltip.setText(item.getSubjectName()+
+                                            "\nUnits of credit: "+item.getSubjectUnits()+
+                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nTrimester Offering: "+item.getOffering());
+                            setTooltip(tooltip);
+                        } else {
+                            setText("");
+                            setTooltip(null);
+                        }
+                    }
+                };
+                return cell;
+            }
+        });
+       
+       trimester15.setCellFactory(new Callback<ListView<Subject>, ListCell<Subject>>() {
+            public ListCell<Subject> call(ListView<Subject> param) {
+                Tooltip tooltip = new Tooltip();
+                ListCell<Subject> cell = new ListCell<Subject>() {
+                    @Override
+                    public void updateItem(Subject item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item != null) {
+                            setText(item.getSubjectCode());
+                            tooltip.setText(item.getSubjectName()+
+                                            "\nUnits of credit: "+item.getSubjectUnits()+
+                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nTrimester Offering: "+item.getOffering());
+                            setTooltip(tooltip);
+                        } else {
+                            setText("");
+                            setTooltip(null);
+                        }
+                    }
+                };
+                return cell;
+            }
+        });
+   }
+   
+   public ArrayList<Subject> loadCourseDB() throws ClassNotFoundException, SQLException {
+       Statement stm;
+       Connection conn = DriverManager.getConnection("jdbc:derby://localhost:1527/PrometheusDB", "student", "1234");
+       stm = conn.createStatement(); 
+       
+       ResultSet rst;
+       rst = stm.executeQuery(sql);
+       ArrayList<Subject> courseList = new ArrayList<>();
+       try {
+            while (rst.next()) {
+                Subject subject = new Subject(rst.getString("COURSE_CODE"),
+                                              rst.getInt("UOC"),
+                                              rst.getString("COURSE_NAME"),
+                                              rst.getString("CONDITIONS_FOR_ENROLMENT"),
+                                              rst.getString("OFFERING_TERM"));
+                courseList.add(subject);
+            }
+       } catch (Exception e) {
+           System.out.println("loadCourseDB()");
+           e.printStackTrace(); 
+       }
+       return courseList;
+       
+    }
+   
+   @FXML
+   public void searchPressed() throws ClassNotFoundException, SQLException {
+        String userInput = courseSearch.getText();
+        this.sql = "Select DISTINCT * From COURSE WHERE (UPPER(COURSE_CODE) LIKE '%"+userInput.toUpperCase()+"%') "
+                 + "OR (UPPER(COURSE_NAME) LIKE '%"+userInput.toUpperCase()+"%') ORDER BY COURSE_CODE";
+        subjectList.getItems().clear();
+        establishList();
+        this.sql = "Select * From COURSE ORDER BY COURSE_CODE";        
    }
 }
 

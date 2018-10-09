@@ -7,6 +7,7 @@ package prometheustest;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -49,7 +50,7 @@ public class LandingController implements Initializable {
         comboBox3.getItems().addAll("3 years", "4 years", "5 years");
     }
 
-    public void submitPressed(ActionEvent event) throws IOException {
+    public void submitPressed(ActionEvent event) throws IOException, ClassNotFoundException, SQLException {
         String course = comboBox1.getValue().toString();
         int startingYear = Integer.parseInt(comboBox2.getValue().toString());
         String duration = comboBox3.getValue().toString();

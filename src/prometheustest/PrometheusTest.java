@@ -26,8 +26,8 @@ public class PrometheusTest extends Application {
         stage.setScene(scene);
         stage.show();
 
-      //  PrometheusDB.loadDB();
-      //  PrometheusDB.sqlStatement("sqlStatement");
+      //PrometheusDB.loadDB();
+       //PrometheusDB.sqlStatement("");
     }
 
     /**

@@ -16,17 +16,29 @@ public class PrometheusDB {
     public static Connection connection;
     public static Statement statement;
     public static void loadDB()
-            throws SQLException, ClassNotFoundException {
+            throws SQLException, ClassNotFoundException, Exception {
 // Load the JDBC driver
         Class.forName("org.apache.derby.jdbc.ClientDriver");
         System.out.println("Driver loaded");
 // Establish a connection
-        connection = DriverManager.getConnection("jdbc:derby://localhost:1527/Prometheus", "Josiah", "1234");
+        connection = DriverManager.getConnection("jdbc:derby://localhost:1527/PrometheusDB", "student", "1234");
         System.out.println("Database connected");
+        
+        try {
+
+			CSVLoader loader = new CSVLoader(connection);
+                        ResultSet resultSet=sqlStatement("Select * from student.course");
+			if(!resultSet.next() ){
+			loader.loadCSV("C:\\Users\\josiah\\Documents\\NetBeansProjects\\PrometheusTest\\src\\prometheustest\\courseData.csv", "COURSE", false);
+                        };
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+     
 
     }
     
-    public ResultSet sqlStatement(String sqlStatement) throws SQLException{
+    public static ResultSet sqlStatement(String sqlStatement) throws SQLException{
         
         // Create a statement
         statement = connection.createStatement();

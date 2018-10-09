@@ -8,10 +8,12 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="PrometheusTest.jar" size="27693" download="eager" />
+    <jar href="PrometheusTest.jar" size="171408" download="eager" />
+    <jar href="lib\commons-lang3-3.1.jar" size="315805" download="eager" />
     <jar href="lib\derby.jar" size="3104883" download="eager" />
     <jar href="lib\derbyclient.jar" size="585704" download="eager" />
     <jar href="lib\derbynet.jar" size="266471" download="eager" />
+    <jar href="lib\opencsv-2.2.jar" size="12771" download="eager" />
   </resources>
   <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="PrometheusTest" >
     <param name="requiredFXVersion" value="8.0+"/>
