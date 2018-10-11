@@ -5,7 +5,12 @@
  */
 package prometheustest;
 
+import com.jfoenix.controls.*;
+import eu.hansolo.enzo.gauge.FlatGauge;
+
+import java.awt.Desktop;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -19,6 +24,7 @@ import javafx.collections.ObservableList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -28,9 +34,11 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
@@ -41,6 +49,7 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 /**
@@ -55,11 +64,13 @@ public abstract class ParentDashboardController implements Initializable {
     @FXML
     public Label startYear;
     @FXML
-    public Button backButton;
+    public JFXButton backButton;
     @FXML
     public Button recommend;
     @FXML
-    public Button clear;
+    public JFXButton clear;
+    @FXML
+    public JFXButton webLinkButton;
     @FXML
     public ListView subjectList;
     @FXML
@@ -115,9 +126,9 @@ public abstract class ParentDashboardController implements Initializable {
     
     private String sql = "SELECT * FROM COURSE ORDER BY COURSE_CODE";
     @FXML
-    public TextField courseSearch;
+    public JFXTextField courseSearch;
     @FXML
-    public Button courseSearchButton;
+    public JFXButton courseSearchButton; 
     
     // Progress bar
     @FXML
@@ -126,7 +137,7 @@ public abstract class ParentDashboardController implements Initializable {
     private int totalUnits = 0;
     
     @FXML
-    public ProgressBar unitProgressBar;
+    public JFXProgressBar unitProgressBar; 
     
     //Temporary Variables 
     List<String> temporaryList = new ArrayList<>();
@@ -134,73 +145,97 @@ public abstract class ParentDashboardController implements Initializable {
     private int dragUnits;
     public String tempPrerequisites;
     public String listViewSource;
+    public String tempFaculty;
+    
     
     //ProgressionWheelArrays
     List<String> businessCores = new ArrayList<>();
     List<String> informationSystemsCores = new ArrayList<>();
     List<String> prescribedElectives = new ArrayList<>();
-    @FXML
-    public Label businessCoresLabel;
-    @FXML
-    public Label ISCoresLabel;
-    @FXML
-    public Label prescribedElectivesLabel;
+    List<String> flexibleCores = new ArrayList<>();
+    List<String> level1Cores = new ArrayList<>();
+    List<String> level2Cores = new ArrayList<>();
+    List<String> level3Cores = new ArrayList<>();
+    
+    
+    
     private int businessCoresUnits = 0;
     private int ISCoresUnits = 0;
     private int prescribedElectivesUnits = 0; 
+    private int freeElectivesUnits = 0;
+    private int generalEducationUnits = 0;
+    
+    
     @FXML
-    public ProgressIndicator businessCoreProgress;
+    public JFXButton businessCoresButton;
     @FXML
-    public ProgressIndicator ISCoreProgress;
+    public JFXButton ISCoresButton;
     @FXML
-    public ProgressIndicator prescribedElectiveProgress;
+    public JFXButton prescribedElectivesButton;
+    @FXML
+    public JFXButton freeElectivesButton;
+    @FXML
+    public JFXButton generalEducationButton;
+    
+    @FXML
+    public FlatGauge businessCoresGauge; 
+    @FXML 
+    public FlatGauge ISCoresGauge;
+    @FXML
+    public FlatGauge prescribedElectivesGauge;
+    @FXML
+    public FlatGauge freeElectivesGauge;
+    @FXML
+    public FlatGauge generalEducationGauge;
+         
+    
     
     //Subjects
-    private Subject INFS1602 = new Subject("INFS1602", 6, "Digital Transformation in Business", "", "T1, T2, T3");
-    private Subject INFS1603 = new Subject("INFS1603", 6, "Introduction to Business Databases", "", "T1, T2");
-    private Subject INFS1609 = new Subject("INFS1609", 6, "Fundamentals of Business Programming", "", "T1, T3");
-    private Subject ACCT1501 = new Subject("ACCT1501", 6, "Accounting and Financial Management 1A", "", "T1, T2, T3");
-    private Subject MGMT1001 = new Subject("MGMT1001", 6, "Managing Organisations and People", "", "T1, T2, T3");
-    private Subject ECON1101 = new Subject("ECON1101", 6, "Microeconomics 1", "", "T1, T2, T3");
-    private Subject MATH1041 = new Subject("MATH1041", 6, "Statistics for Life and Social Sciences", "", "T1, T2, T3");
-    private Subject ECON1203 = new Subject("ECON1203", 6, "Business and Economic Statistics", "", "T1, T2, T3");
-    private Subject ACCT1511 = new Subject("ACCT1511", 6, "Accounting and Financial Management 1B", "ACCT1501", "T1, T2");
-    
-    private Subject INFS2603 = new Subject("INFS2603", 6, "Business Analysis", "INFS1602, INFS1603", "T3");
-    private Subject INFS2605 = new Subject("INFS2605", 6, "Intermediate Business Programming", "INFS1603, INFS1609", "T1, T2");
-    private Subject INFS2608 = new Subject("INFS2608", 6, "Database Management & Big Data Infrastructures", "INFS1603", "T1");
-    private Subject INFS2621 = new Subject("INFS2621", 6, "Enterprise Systems", "INFS1602", "T2");
-    private Subject INFS2631 = new Subject("INFS2631", 6, "Innovation and Technology Management", "INFS1602", "T1");
-    
-    private Subject INFS3603 = new Subject("INFS3603", 6, "Introduction to Business Analytics", "INFS1602, 72 UOC", "T1, T2");
-    private Subject INFS3617 = new Subject("INFS3617", 6, "Networking & Cyber Security", "INFS1602, 72 UOC", "T1");
-    private Subject INFS3020 = new Subject("INFS3020", 6, "International IS/IT Practicum", "Minimum WAM of 60, 96 UOC (36UOC INFS)", "T2");
-    private Subject INFS3632 = new Subject("INFS3632", 6, "Service and Quality Management", "INFS1602, 72 UOC", "T2");
-    private Subject INFS3604 = new Subject("INFS3604", 6, "Business Process Management", "INFS2603, 72 UOC", "T3");
-    private Subject INFS3873 = new Subject("INFS3873", 6, "Business Analytics Methods", "INFS3603, 72 UOC", "T3");
-    private Subject INFS3634 = new Subject("INFS3634", 6, "Mobile Applications Development", "INFS2605, INFS2608, 72 UOC", "T1, T3");
-    private Subject INFS3830 = new Subject("INFS3830", 6, "Social Media and Analytics", "INFS3603, 72 UOC", "T1");
-    private Subject INFS3605 = new Subject("INFS3605", 6, "IS Innovation & Transformation", "INFS3634 or INFS3611, 72 UOC", "T1, T2");
-    //BIS (Co-op) Exclusive
-    private Subject INFS2101 = new Subject("INFS2101", 12, "Industry Placement 1", "INFS2603", "T1");
-    private Subject INFS3202 = new Subject("INFS3202", 12, "Industry Pacement 2", "INFS2101", "T1");
-    private Subject INFS3303 = new Subject("INFS3303", 12, "Industry Placement 3", "INFS3202", "T2, T3");
-    private Subject INFS4800 = new Subject("INFS4800", 6, "Thesis A", "Enrolled in Honours", "T1");
-    private Subject INFS4801 = new Subject("INFS4801", 6, "Thesis B", "INFS4800", "T1");
-    private Subject INFS4802 = new Subject("INFS4802", 6, "Thesis C", "TBA", "TBA");
-    private Subject INFS4886 = new Subject("INFS4886", 6, "Principles of Research Design", "Enrolled in Honours", "T3");
-    private Subject INFS4887 = new Subject("INFS4887", 6, "Business Research Methods", "Enrolled in Honours, INFS4886", "T1");
-    private Subject INFS4831 = new Subject("INFS4831", 6, "Information Systems Consulting", "Enrolled in Honours", "T1");
-    private Subject INFS4858 = new Subject("INFS4858", 6, "Managing Complex Projects", "Enrolled in Honours", "T1");
-    private Subject INFS4907 = new Subject("INFS4907", 6, "Managing Security and Ethics in Cyberspace", "Enroleld in Honours", "T2");
-    //Comm/InfoSys Exclusive
-    private Subject COMM1000 = new Subject("COMM1000", 6, "Creating Social Change", "", "T1, T2, T3");
-    private Subject ECON1102 = new Subject("ECON1102", 6, "Macroeconomics 1", "ECON1101", "T1, T2");
-    private Subject FINS1613 = new Subject("FINS1613", 6, "Business Finance", "", "T1, T2, T3");
-    private Subject MARK1012 = new Subject("MARK1012", 6, "Marketing Fundamentals", "", "T1, T2, T3");
-    private Subject MGMT1101 = new Subject("MGMT1101", 6, "Global Business Environment", "", "T1, T2, T3");
-    private Subject TABL1710 = new Subject("TABL1710", 6, "Business and the Law", "Not enrolled in Law programs", "T1, T2, T3");
-            
+//    private Subject INFS1602 = new Subject("INFS1602", 6, "Digital Transformation in Business", "", "T1, T2, T3");
+//    private Subject INFS1603 = new Subject("INFS1603", 6, "Introduction to Business Databases", "", "T1, T2");
+//    private Subject INFS1609 = new Subject("INFS1609", 6, "Fundamentals of Business Programming", "", "T1, T3");
+//    private Subject ACCT1501 = new Subject("ACCT1501", 6, "Accounting and Financial Management 1A", "", "T1, T2, T3");
+//    private Subject MGMT1001 = new Subject("MGMT1001", 6, "Managing Organisations and People", "", "T1, T2, T3");
+//    private Subject ECON1101 = new Subject("ECON1101", 6, "Microeconomics 1", "", "T1, T2, T3");
+//    private Subject MATH1041 = new Subject("MATH1041", 6, "Statistics for Life and Social Sciences", "", "T1, T2, T3");
+//    private Subject ECON1203 = new Subject("ECON1203", 6, "Business and Economic Statistics", "", "T1, T2, T3");
+//    private Subject ACCT1511 = new Subject("ACCT1511", 6, "Accounting and Financial Management 1B", "ACCT1501", "T1, T2");
+//    
+//    private Subject INFS2603 = new Subject("INFS2603", 6, "Business Analysis", "INFS1602, INFS1603", "T3");
+//    private Subject INFS2605 = new Subject("INFS2605", 6, "Intermediate Business Programming", "INFS1603, INFS1609", "T1, T2");
+//    private Subject INFS2608 = new Subject("INFS2608", 6, "Database Management & Big Data Infrastructures", "INFS1603", "T1");
+//    private Subject INFS2621 = new Subject("INFS2621", 6, "Enterprise Systems", "INFS1602", "T2");
+//    private Subject INFS2631 = new Subject("INFS2631", 6, "Innovation and Technology Management", "INFS1602", "T1");
+//    
+//    private Subject INFS3603 = new Subject("INFS3603", 6, "Introduction to Business Analytics", "INFS1602, 72 UOC", "T1, T2");
+//    private Subject INFS3617 = new Subject("INFS3617", 6, "Networking & Cyber Security", "INFS1602, 72 UOC", "T1");
+//    private Subject INFS3020 = new Subject("INFS3020", 6, "International IS/IT Practicum", "Minimum WAM of 60, 96 UOC (36UOC INFS)", "T2");
+//    private Subject INFS3632 = new Subject("INFS3632", 6, "Service and Quality Management", "INFS1602, 72 UOC", "T2");
+//    private Subject INFS3604 = new Subject("INFS3604", 6, "Business Process Management", "INFS2603, 72 UOC", "T3");
+//    private Subject INFS3873 = new Subject("INFS3873", 6, "Business Analytics Methods", "INFS3603, 72 UOC", "T3");
+//    private Subject INFS3634 = new Subject("INFS3634", 6, "Mobile Applications Development", "INFS2605, INFS2608, 72 UOC", "T1, T3");
+//    private Subject INFS3830 = new Subject("INFS3830", 6, "Social Media and Analytics", "INFS3603, 72 UOC", "T1");
+//    private Subject INFS3605 = new Subject("INFS3605", 6, "IS Innovation & Transformation", "INFS3634 or INFS3611, 72 UOC", "T1, T2");
+//    //BIS (Co-op) Exclusive
+//    private Subject INFS2101 = new Subject("INFS2101", 12, "Industry Placement 1", "INFS2603", "T1");
+//    private Subject INFS3202 = new Subject("INFS3202", 12, "Industry Pacement 2", "INFS2101", "T1");
+//    private Subject INFS3303 = new Subject("INFS3303", 12, "Industry Placement 3", "INFS3202", "T2, T3");
+//    private Subject INFS4800 = new Subject("INFS4800", 6, "Thesis A", "Enrolled in Honours", "T1");
+//    private Subject INFS4801 = new Subject("INFS4801", 6, "Thesis B", "INFS4800", "T1");
+//    private Subject INFS4802 = new Subject("INFS4802", 6, "Thesis C", "TBA", "TBA");
+//    private Subject INFS4886 = new Subject("INFS4886", 6, "Principles of Research Design", "Enrolled in Honours", "T3");
+//    private Subject INFS4887 = new Subject("INFS4887", 6, "Business Research Methods", "Enrolled in Honours, INFS4886", "T1");
+//    private Subject INFS4831 = new Subject("INFS4831", 6, "Information Systems Consulting", "Enrolled in Honours", "T1");
+//    private Subject INFS4858 = new Subject("INFS4858", 6, "Managing Complex Projects", "Enrolled in Honours", "T1");
+//    private Subject INFS4907 = new Subject("INFS4907", 6, "Managing Security and Ethics in Cyberspace", "Enroleld in Honours", "T2");
+//    //Comm/InfoSys Exclusive
+//    private Subject COMM1000 = new Subject("COMM1000", 6, "Creating Social Change", "", "T1, T2, T3");
+//    private Subject ECON1102 = new Subject("ECON1102", 6, "Macroeconomics 1", "ECON1101", "T1, T2");
+//    private Subject FINS1613 = new Subject("FINS1613", 6, "Business Finance", "", "T1, T2, T3");
+//    private Subject MARK1012 = new Subject("MARK1012", 6, "Marketing Fundamentals", "", "T1, T2, T3");
+//    private Subject MGMT1101 = new Subject("MGMT1101", 6, "Global Business Environment", "", "T1, T2, T3");
+//    private Subject TABL1710 = new Subject("TABL1710", 6, "Business and the Law", "Not enrolled in Law programs", "T1, T2, T3");
+//            
     /**
      * Initializes the controller class.
      */
@@ -245,6 +280,7 @@ public abstract class ParentDashboardController implements Initializable {
      
     public void establishList() throws ClassNotFoundException, SQLException {
         subjectList.getItems().addAll(this.getSubjectList());
+       
     }
     
     private ObservableList<Subject> getSubjectList() throws ClassNotFoundException, SQLException {
@@ -291,8 +327,8 @@ public abstract class ParentDashboardController implements Initializable {
         if (listView == subjectList) {
             tempUnits = subject.getSubjectUnits();
             tempSubject = subject.getSubjectCode(); 
-            tempPrerequisites = subject.getPrerequisites();
             listViewSource = "subjectList";
+            tempFaculty = subject.getFaculty();
         }
         else {
             listViewSource = "trimester";
@@ -300,7 +336,7 @@ public abstract class ParentDashboardController implements Initializable {
         subjectOffered = subject.getSubjectCode();
         dragUnits = subject.getSubjectUnits();
         trimesterOffering = subject.getOffering();
-        
+        tempPrerequisites = subject.getPrerequisites();
         
         Dragboard dragboard = listView.startDragAndDrop(TransferMode.COPY_OR_MOVE);
         
@@ -326,7 +362,7 @@ public abstract class ParentDashboardController implements Initializable {
         boolean dragCompleted = false;
         Dragboard dragboard = event.getDragboard();
         if (listView != subjectList && sumUnits(listView) > 18) {
-            alert("Adding subject will exceed trimester load.");
+            alert("Adding subject will exceed maximum trimester load of 18 UOC.");
             listView.getSelectionModel().clearSelection();
             subjectList.getSelectionModel().clearSelection();
             dragCompleted = false;
@@ -336,6 +372,9 @@ public abstract class ParentDashboardController implements Initializable {
         }
         else if (temporaryList.contains(tempSubject)) {
             alert("Subject already contained within plan.");
+            dragCompleted = false;
+        }
+        else if (prerequisiteCheck() == false) {
             dragCompleted = false;
         }
         else {
@@ -366,6 +405,7 @@ public abstract class ParentDashboardController implements Initializable {
                 System.out.println(tempPrerequisites);
                 tempSubject = null;
                 tempPrerequisites = null;
+                tempFaculty = "UNSW Business School";
             }
         }
         event.consume();
@@ -608,62 +648,42 @@ public abstract class ParentDashboardController implements Initializable {
    
    @FXML
    public void recommendedPressed() throws ClassNotFoundException, SQLException {
-        if ("3979 - Information Systems".equals(currentUser.getCourse())) {
-            clearTrimesters();
-            subjectList.getItems().removeAll(INFS1602, INFS1603, INFS1609,
-                                             ACCT1501, MGMT1001, ECON1101,
-                                             INFS2603, INFS2605, ECON1203,
-                                             INFS2608, INFS3617, INFS2621,
-                                             INFS3603, INFS3632, INFS3604,
-                                             INFS3873, INFS3634, INFS2631,
-                                             INFS3830, INFS3605);
-            trimester1.getItems().addAll(INFS1602, INFS1603, INFS1609);
-            trimester2.getItems().addAll(ACCT1501, MGMT1001, ECON1101);
-            trimester3.getItems().addAll(INFS2603, INFS2605, ECON1203);
-            trimester4.getItems().addAll(INFS2608, INFS3617);
-            trimester5.getItems().addAll(INFS2621, INFS3603, INFS3632);
-            trimester6.getItems().addAll(INFS3604, INFS3873);
-            trimester7.getItems().addAll(INFS3634, INFS2631, INFS3830);
-            trimester8.getItems().addAll(INFS3605);
-            trimester9.getItems().addAll();
-       }
-        else if ("3584 - Commerce / Information Systems".equals(currentUser.getCourse())) {
-            
-        }
-        else if ("3964 - BIS (Co-op)".equals(currentUser.getCourse())) {
-            
-        }
+       
    }
    
    @FXML
    public void clearTrimesters() throws ClassNotFoundException, SQLException {
-       subjectList.getItems().clear();
-       trimester1.getItems().clear();
-       trimester2.getItems().clear();
-       trimester3.getItems().clear();
-       trimester4.getItems().clear();
-       trimester5.getItems().clear();
-       trimester6.getItems().clear();
-       trimester7.getItems().clear();
-       trimester8.getItems().clear();
-       trimester9.getItems().clear();
+        subjectList.getItems().clear();
+        trimester1.getItems().clear();
+        trimester2.getItems().clear();
+        trimester3.getItems().clear();
+        trimester4.getItems().clear();
+        trimester5.getItems().clear();
+        trimester6.getItems().clear();
+        trimester7.getItems().clear();
+        trimester8.getItems().clear();
+        trimester9.getItems().clear();
+        temporaryList.clear();
+        clearUnitProgress();
+        establishList();
+   }
+   
+   public void clearUnitProgress() {
        totalUnits = 0;
        totalUnitLabel.setText(Integer.toString(totalUnits));
        unitProgressBar.setProgress(0);
-       temporaryList.clear();
        
        businessCoresUnits = 0;
        ISCoresUnits = 0;
        prescribedElectivesUnits = 0; 
+       freeElectivesUnits = 0;
+       generalEducationUnits = 0;
        
-       businessCoresLabel.setText(Integer.toString(businessCoresUnits));
-       ISCoresLabel.setText(Integer.toString(ISCoresUnits));
-       prescribedElectivesLabel.setText(Integer.toString(prescribedElectivesUnits));
-       
-       businessCoreProgress.setProgress(0);
-       ISCoreProgress.setProgress(0);
-       prescribedElectiveProgress.setProgress(0);
-       establishList();
+       businessCoresGauge.setValue(0);
+       ISCoresGauge.setValue(0);
+       prescribedElectivesGauge.setValue(0);
+       freeElectivesGauge.setValue(0);
+       generalEducationGauge.setValue(0);
    }
    
    public int sumUnits(ListView<Subject> listView) {
@@ -706,18 +726,68 @@ public abstract class ParentDashboardController implements Initializable {
    }
    
    public boolean prerequisiteCheck() {
-       if ("INFS1602".equals(tempSubject)) {
-           System.out.println("trueeee");
+       if ("null".equals(tempPrerequisites)) {
            return true;
        }
-       else if ("INFS1603".equals(tempSubject)) {
+       else if ("INFS2603".equals(subjectOffered) && temporaryList.contains("INFS1602") && temporaryList.contains("INFS1603")) {
+           return true; 
+       }
+       else if ("INFS2101".equals(subjectOffered) && temporaryList.contains("INFS2603")) {
            return true;
        }
-       else if ("INFS2603".equals(tempSubject) && temporaryList.contains("INFS1602") && temporaryList.contains("INFS1603")) {
-          return true; 
+       else if ("INFS2605".equals(subjectOffered) && temporaryList.contains("INFS1603") && temporaryList.contains("INFS1609")) {
+           return true;
+       }
+       else if ("INFS2608".equals(subjectOffered) && temporaryList.contains("INFS1603")) {
+           return true;
+       }
+       else if ("INFS2609".equals(subjectOffered) && temporaryList.contains("INFS1602") && temporaryList.contains("INFS1603")) {
+           return true;
+       }
+       else if ("INFS2621".equals(subjectOffered) && temporaryList.contains("INFS1602")) {
+           return true;
+       }
+       else if ("INFS2631".equals(subjectOffered) && temporaryList.contains("INFS1602")) {
+           return true;
+       }
+       else if ("INFS3020".equals(subjectOffered) && totalUnits >= 90) {
+           return true;
+       }
+       else if ("INFS3202".equals(subjectOffered) && temporaryList.contains("INFS2101")) {
+           return true;
+       }
+       else if ("INFS3303".equals(subjectOffered) && temporaryList.contains("INFS3202")) {
+           return true;
+       }
+       else if ("INFS3603".equals(subjectOffered) && temporaryList.contains("INFS1602")) {
+           return true;
+       }
+       else if ("INFS3604".equals(subjectOffered) && temporaryList.contains("INFS2603")) {
+           return true;
+       }
+       else if ("INFS3605".equals(subjectOffered) && temporaryList.contains("INFS3634")) {
+           return true;
+       }
+       else if ("INFS3617".equals(subjectOffered) && temporaryList.contains("INFS1602")) {
+           return true;
+       }
+       else if ("INFS3632".equals(subjectOffered) && temporaryList.contains("INFS1602")) {
+           return true;
+       }
+       else if ("INFS3634".equals(subjectOffered) && temporaryList.contains("INFS2605") && temporaryList.contains("INFS2608")) {
+           return true;
+       }
+       else if ("INFS3830".equals(subjectOffered) && temporaryList.contains("INFS3603")) {
+           return true;
+       }
+       else if ("INFS3873".equals(subjectOffered) && temporaryList.contains("INFS3603")) {
+           return true;
+       }
+       else if (!subjectOffered.contains("INFS")) {
+           return true;
        }
        else {
-           System.out.println("It false yo");
+           alert(tempSubject+" prerequisites not fulfilled. "+tempPrerequisites);
            return false;
        }
     
@@ -725,6 +795,8 @@ public abstract class ParentDashboardController implements Initializable {
    
    public void progressionWheelArrays() {
         
+       
+       //Information Systems
         businessCores.add("ACCT1501");
         businessCores.add("MGMT1001");
         businessCores.add("ECON1203"); 
@@ -750,37 +822,65 @@ public abstract class ParentDashboardController implements Initializable {
         prescribedElectives.add("INFS3632");
         prescribedElectives.add("INFS3830");
         prescribedElectives.add("INFS3873");
+        
+        //Commerce / Information Systems
+        flexibleCores.add("ACCT1511");
+        flexibleCores.add("COMM1000");
+        flexibleCores.add("ECON1102");
+        flexibleCores.add("FINS1613");
+        flexibleCores.add("INFS1602");
+        flexibleCores.add("MARK1012");
+        flexibleCores.add("MGMT1101");
+        flexibleCores.add("TABL1710");
+        
    }
    
    public void progressionWheelIncrement() {
        if (businessCores.contains(tempSubject)) {
            businessCoresUnits += dragUnits;
-           businessCoresLabel.setText(Integer.toString(businessCoresUnits));
-           double x = (double) businessCoresUnits;
-           double progress = x/24;
-           businessCoreProgress.setProgress(progress);
+           businessCoresGauge.setValue(businessCoresUnits);
        }
        else if (informationSystemsCores.contains(tempSubject)) {
            ISCoresUnits += dragUnits;
-           ISCoresLabel.setText(Integer.toString(ISCoresUnits));
-           double x = (double) ISCoresUnits;
-           double progress = x/72;
-           ISCoreProgress.setProgress(progress);
+           ISCoresGauge.setValue(ISCoresUnits);
        }
        else if (prescribedElectives.contains(tempSubject)) {
-           prescribedElectivesUnits += dragUnits;
-           prescribedElectivesLabel.setText(Integer.toString(prescribedElectivesUnits));
-           double x = (double) prescribedElectivesUnits;
-           double progress = x/12;
-           prescribedElectiveProgress.setProgress(progress);
+           if (prescribedElectivesUnits == 12) {
+                freeElectivesUnits += dragUnits;
+                freeElectivesGauge.setValue(freeElectivesUnits);
+           }
+           else {
+                prescribedElectivesUnits += dragUnits;
+                prescribedElectivesGauge.setValue(prescribedElectivesUnits);
+           }
+           
        }
-       else {
-           System.out.println("no");
+       else if (!"UNSW Business School".equals(tempFaculty) ) {
+           if (generalEducationUnits == 12) {
+                freeElectivesUnits += dragUnits;
+                freeElectivesGauge.setValue(freeElectivesUnits); 
+           }
+           else {
+                generalEducationUnits += dragUnits;
+                generalEducationGauge.setValue(generalEducationUnits);
+           }
+           
+       }
+       else {   
+           if (temporaryList.contains(subjectOffered)) {
+               //Do nothing
+           }
+           else {
+            freeElectivesUnits += dragUnits;
+            freeElectivesGauge.setValue(freeElectivesUnits);   
+           }
+            
        }
    }
        
    
    public void establishToolTip() {
+       
        subjectList.setCellFactory(new Callback<ListView<Subject>, ListCell<Subject>>() {
             public ListCell<Subject> call(ListView<Subject> param) {
                 Tooltip tooltip = new Tooltip();
@@ -792,7 +892,7 @@ public abstract class ParentDashboardController implements Initializable {
                             setText(item.getSubjectCode());
                             tooltip.setText(item.getSubjectName()+
                                             "\nUnits of credit: "+item.getSubjectUnits()+
-                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nPrerequisites: "+item.getPrerequisites()+
                                             "\nTrimester Offering: "+item.getOffering());
                             setTooltip(tooltip);
                         } else {
@@ -816,7 +916,7 @@ public abstract class ParentDashboardController implements Initializable {
                             setText(item.getSubjectCode());
                             tooltip.setText(item.getSubjectName()+
                                             "\nUnits of credit: "+item.getSubjectUnits()+
-                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nPrerequisites: "+item.getPrerequisites()+
                                             "\nTrimester Offering: "+item.getOffering());
                             setTooltip(tooltip);
                         } else {
@@ -840,7 +940,7 @@ public abstract class ParentDashboardController implements Initializable {
                             setText(item.getSubjectCode());
                             tooltip.setText(item.getSubjectName()+
                                             "\nUnits of credit: "+item.getSubjectUnits()+
-                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nPrerequisites: "+item.getPrerequisites()+
                                             "\nTrimester Offering: "+item.getOffering());
                             setTooltip(tooltip);
                         } else {
@@ -864,7 +964,7 @@ public abstract class ParentDashboardController implements Initializable {
                             setText(item.getSubjectCode());
                             tooltip.setText(item.getSubjectName()+
                                             "\nUnits of credit: "+item.getSubjectUnits()+
-                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nPrerequisites: "+item.getPrerequisites()+
                                             "\nTrimester Offering: "+item.getOffering());
                             setTooltip(tooltip);
                         } else {
@@ -888,7 +988,7 @@ public abstract class ParentDashboardController implements Initializable {
                             setText(item.getSubjectCode());
                             tooltip.setText(item.getSubjectName()+
                                             "\nUnits of credit: "+item.getSubjectUnits()+
-                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nPrerequisites: "+item.getPrerequisites()+
                                             "\nTrimester Offering: "+item.getOffering());
                             setTooltip(tooltip);
                         } else {
@@ -912,7 +1012,7 @@ public abstract class ParentDashboardController implements Initializable {
                             setText(item.getSubjectCode());
                             tooltip.setText(item.getSubjectName()+
                                             "\nUnits of credit: "+item.getSubjectUnits()+
-                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nPrerequisites: "+item.getPrerequisites()+
                                             "\nTrimester Offering: "+item.getOffering());
                             setTooltip(tooltip);
                         } else {
@@ -936,7 +1036,7 @@ public abstract class ParentDashboardController implements Initializable {
                             setText(item.getSubjectCode());
                             tooltip.setText(item.getSubjectName()+
                                             "\nUnits of credit: "+item.getSubjectUnits()+
-                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nPrerequisites: "+item.getPrerequisites()+
                                             "\nTrimester Offering: "+item.getOffering());
                             setTooltip(tooltip);
                         } else {
@@ -960,7 +1060,7 @@ public abstract class ParentDashboardController implements Initializable {
                             setText(item.getSubjectCode());
                             tooltip.setText(item.getSubjectName()+
                                             "\nUnits of credit: "+item.getSubjectUnits()+
-                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nPrerequisites: "+item.getPrerequisites()+
                                             "\nTrimester Offering: "+item.getOffering());
                             setTooltip(tooltip);
                         } else {
@@ -984,7 +1084,7 @@ public abstract class ParentDashboardController implements Initializable {
                             setText(item.getSubjectCode());
                             tooltip.setText(item.getSubjectName()+
                                             "\nUnits of credit: "+item.getSubjectUnits()+
-                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nPrerequisites: "+item.getPrerequisites()+
                                             "\nTrimester Offering: "+item.getOffering());
                             setTooltip(tooltip);
                         } else {
@@ -1008,7 +1108,7 @@ public abstract class ParentDashboardController implements Initializable {
                             setText(item.getSubjectCode());
                             tooltip.setText(item.getSubjectName()+
                                             "\nUnits of credit: "+item.getSubjectUnits()+
-                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nPrerequisites: "+item.getPrerequisites()+
                                             "\nTrimester Offering: "+item.getOffering());
                             setTooltip(tooltip);
                         } else {
@@ -1036,7 +1136,7 @@ public abstract class ParentDashboardController implements Initializable {
                             setText(item.getSubjectCode());
                             tooltip.setText(item.getSubjectName()+
                                             "\nUnits of credit: "+item.getSubjectUnits()+
-                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nPrerequisites: "+item.getPrerequisites()+
                                             "\nTrimester Offering: "+item.getOffering());
                             setTooltip(tooltip);
                         } else {
@@ -1060,7 +1160,7 @@ public abstract class ParentDashboardController implements Initializable {
                             setText(item.getSubjectCode());
                             tooltip.setText(item.getSubjectName()+
                                             "\nUnits of credit: "+item.getSubjectUnits()+
-                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nPrerequisites: "+item.getPrerequisites()+
                                             "\nTrimester Offering: "+item.getOffering());
                             setTooltip(tooltip);
                         } else {
@@ -1084,7 +1184,7 @@ public abstract class ParentDashboardController implements Initializable {
                             setText(item.getSubjectCode());
                             tooltip.setText(item.getSubjectName()+
                                             "\nUnits of credit: "+item.getSubjectUnits()+
-                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nPrerequisites: "+item.getPrerequisites()+
                                             "\nTrimester Offering: "+item.getOffering());
                             setTooltip(tooltip);
                         } else {
@@ -1111,7 +1211,7 @@ public abstract class ParentDashboardController implements Initializable {
                             setText(item.getSubjectCode());
                             tooltip.setText(item.getSubjectName()+
                                             "\nUnits of credit: "+item.getSubjectUnits()+
-                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nPrerequisites: "+item.getPrerequisites()+
                                             "\nTrimester Offering: "+item.getOffering());
                             setTooltip(tooltip);
                         } else {
@@ -1135,7 +1235,7 @@ public abstract class ParentDashboardController implements Initializable {
                             setText(item.getSubjectCode());
                             tooltip.setText(item.getSubjectName()+
                                             "\nUnits of credit: "+item.getSubjectUnits()+
-                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nPrerequisites: "+item.getPrerequisites()+
                                             "\nTrimester Offering: "+item.getOffering());
                             setTooltip(tooltip);
                         } else {
@@ -1159,7 +1259,7 @@ public abstract class ParentDashboardController implements Initializable {
                             setText(item.getSubjectCode());
                             tooltip.setText(item.getSubjectName()+
                                             "\nUnits of credit: "+item.getSubjectUnits()+
-                                            "\nPrequisites: "+item.getPrerequisites()+
+                                            "\nPrerequisites: "+item.getPrerequisites()+
                                             "\nTrimester Offering: "+item.getOffering());
                             setTooltip(tooltip);
                         } else {
@@ -1171,6 +1271,21 @@ public abstract class ParentDashboardController implements Initializable {
                 return cell;
             }
         });
+   }
+   
+   @FXML
+   public void loadWebLink() {
+       Subject subject = (Subject) subjectList.getSelectionModel().getSelectedItem();
+       String courseLink = subject.getURL();
+       try {
+            Desktop.getDesktop().browse(new URL(courseLink).toURI());
+        } catch (IOException e) {
+             e.printStackTrace();
+        } catch (URISyntaxException e) {
+             e.printStackTrace();
+        }
+       
+       
    }
    
    public ArrayList<Subject> loadCourseDB() throws ClassNotFoundException, SQLException {
@@ -1187,7 +1302,9 @@ public abstract class ParentDashboardController implements Initializable {
                                               rst.getInt("UOC"),
                                               rst.getString("COURSE_NAME"),
                                               rst.getString("CONDITIONS_FOR_ENROLMENT"),
-                                              rst.getString("OFFERING_TERM"));
+                                              rst.getString("OFFERING_TERM"),
+                                              rst.getString("FACULTY"),
+                                              rst.getString("COURSE_LINK"));
                 courseList.add(subject);
             }
        } catch (Exception e) {
@@ -1206,6 +1323,63 @@ public abstract class ParentDashboardController implements Initializable {
         subjectList.getItems().clear();
         establishList();
         this.sql = "Select * From COURSE ORDER BY COURSE_CODE";        
+   }
+   
+   @FXML
+   public void businessCoresPressed() throws ClassNotFoundException, SQLException {
+       this.sql = "SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'ACCT1501' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'MGMT1001' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'ECON1203' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'MATH1041' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'ACCT1511' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'ECON1101'";
+        subjectList.getItems().clear();
+        establishList();
+        this.sql = "Select * From COURSE ORDER BY COURSE_CODE";        
+   }
+   
+   @FXML
+   public void ISCoresPressed() throws ClassNotFoundException, SQLException {
+        this.sql = "SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'INFS1602' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'INFS1603' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'INFS1609' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'INFS2603' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'INFS2605' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'INFS2608' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'INFS2621' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'INFS3603' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'INFS3604' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'INFS3605' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'INFS3617' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'INFS3634' ORDER BY COURSE_CODE";
+        subjectList.getItems().clear();
+        establishList();
+        this.sql = "Select * From COURSE ORDER BY COURSE_CODE";         
+   }
+   
+   @FXML
+   public void prescribedElectivesPressed() throws ClassNotFoundException, SQLException {
+       this.sql = "SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'INFS2631' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'INFS3020' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'INFS3632' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'INFS3830' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'INFS3873'";
+        subjectList.getItems().clear();
+        establishList();
+        this.sql = "Select * From COURSE ORDER BY COURSE_CODE";
+   }
+   
+   @FXML
+   public void freeElectivesPressed() {
+       
+   }
+   
+   @FXML
+   public void generalEducationPressed() throws ClassNotFoundException, SQLException {
+       this.sql = "SELECT DISTINCT * from COURSE WHERE NOT FACULTY = 'UNSW Business School' ORDER BY COURSE_CODE";
+       subjectList.getItems().clear();
+        establishList();
+        this.sql = "Select * From COURSE ORDER BY COURSE_CODE";
    }
 }
 

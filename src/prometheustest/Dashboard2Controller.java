@@ -39,6 +39,7 @@ public class Dashboard2Controller extends ParentDashboardController {
         super.dashboard2Handlers();
         establishToolTip();
         establishToolTip2();
+        progressionWheelArrays();
     }
    
     @Override

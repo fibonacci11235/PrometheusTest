@@ -5,6 +5,8 @@
  */
 package prometheustest;
 
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXComboBox;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -29,13 +31,13 @@ import javafx.stage.Stage;
 public class LandingController implements Initializable {
 
     @FXML
-    private ComboBox comboBox1;
+    private JFXComboBox comboBox1;
     @FXML
-    private ComboBox comboBox2;
+    private JFXComboBox comboBox2;
     @FXML
-    private ComboBox comboBox3;
+    private JFXComboBox comboBox3;
     @FXML
-    private Button submit;
+    private JFXButton submit;
     
     private String resource;
 

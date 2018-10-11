@@ -19,14 +19,18 @@ public class Subject implements Serializable {
     private String subjectName;
     private String prerequisites;
     private String offering;
+    private String faculty; 
+    private String URL;
 
     public Subject(String subjectCode, int subjectUnits, String subjectName, 
-                    String prerequisites, String offering) {
+                    String prerequisites, String offering, String faculty, String URL) {
         this.subjectCode = subjectCode;
         this.subjectUnits = subjectUnits;
         this.subjectName = subjectName;
         this.prerequisites = prerequisites;
         this.offering = offering;
+        this.faculty = faculty;
+        this.URL = URL;
     }
 
 
@@ -51,6 +55,14 @@ public class Subject implements Serializable {
         return offering;
     }
     
+    public String getFaculty() {
+        return faculty;
+    }
+    
+    public String getURL() {
+        return URL;
+    }
+    
     //Setters
     public void setSubjectCode(String subjectCode) {
         this.subjectCode = subjectCode;
@@ -70,6 +82,14 @@ public class Subject implements Serializable {
     
     public void setOffering(String offering) {
         this.offering = offering;
+    }
+    
+    public void setFaculty(String faculty) {
+        this.faculty = faculty;
+    }
+    
+    public void setURL(String URL) {
+        this.URL = URL;
     }
     
     @Override

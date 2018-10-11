@@ -3,48 +3,102 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="549.0" prefWidth="770.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="prometheustest.Dashboard2Controller">
+<AnchorPane id="AnchorPane" prefHeight="671.0" prefWidth="891.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="prometheustest.Dashboard2Controller">
    <children>
-      <SplitPane prefHeight="549.0" prefWidth="149.0">
+      <SplitPane prefHeight="671.0" prefWidth="190.0">
          <items>
-            <AnchorPane prefHeight="547.0" prefWidth="160.0">
+            <AnchorPane prefHeight="670.0" prefWidth="188.0">
                <children>
-                  <ListView fx:id="subjectList" layoutX="11.0" layoutY="65.0" prefHeight="402.0" prefWidth="126.0" />
-                  <Button fx:id="backButton" layoutX="11.0" layoutY="508.0" mnemonicParsing="false" onAction="#backPressed" text="Back to landing page" />
+                  <Button fx:id="backButton" layoutX="21.0" layoutY="619.0" mnemonicParsing="false" onAction="#backPressed" text="Back to landing page" />
+                  <ListView fx:id="subjectList" layoutX="15.0" layoutY="125.0" prefHeight="442.0" prefWidth="159.0" />
+                  <Label layoutX="21.0" layoutY="14.0" text="Filter" />
+                  <TextField fx:id="courseSearch" layoutX="15.0" layoutY="39.0" prefHeight="25.0" prefWidth="159.0" promptText="Enter course code or name" />
+                  <Button fx:id="courseSearchButton" layoutX="15.0" layoutY="71.0" mnemonicParsing="false" onAction="#searchPressed" prefHeight="25.0" prefWidth="159.0" text="Search" />
+                  <Button fx:id="webLinkButton" layoutX="38.0" layoutY="579.0" mnemonicParsing="false" onAction="#loadWebLink" text="Course Outline" />
                </children>
             </AnchorPane>
          </items>
       </SplitPane>
-      <ListView fx:id="trimester1" layoutX="258.0" layoutY="100.0" prefHeight="85.0" prefWidth="152.0" />
-      <ListView fx:id="trimester2" layoutX="425.0" layoutY="100.0" prefHeight="85.0" prefWidth="152.0" />
-      <ListView fx:id="trimester3" layoutX="598.0" layoutY="100.0" prefHeight="85.0" prefWidth="152.0" />
-      <ListView fx:id="trimester4" layoutX="258.0" layoutY="200.0" prefHeight="85.0" prefWidth="152.0" />
-      <ListView fx:id="trimester5" layoutX="425.0" layoutY="200.0" prefHeight="85.0" prefWidth="152.0" />
-      <ListView fx:id="trimester6" layoutX="598.0" layoutY="200.0" prefHeight="85.0" prefWidth="152.0" />
-      <ListView fx:id="trimester7" layoutX="258.0" layoutY="303.0" prefHeight="85.0" prefWidth="152.0" />
-      <ListView fx:id="trimester8" layoutX="425.0" layoutY="303.0" prefHeight="85.0" prefWidth="152.0" />
-      <ListView fx:id="trimester9" layoutX="598.0" layoutY="303.0" prefHeight="85.0" prefWidth="152.0" />
-      <ListView fx:id="trimester10" layoutX="258.0" layoutY="411.0" prefHeight="85.0" prefWidth="152.0" />
-      <ListView fx:id="trimester11" layoutX="425.0" layoutY="411.0" prefHeight="85.0" prefWidth="152.0" />
-      <ListView fx:id="trimester12" layoutX="598.0" layoutY="411.0" prefHeight="85.0" prefWidth="152.0" />
-      <TextField fx:id="alertField" editable="false" layoutX="172.0" layoutY="510.0" prefHeight="25.0" prefWidth="578.0" text="Alert Field" />
-      <Label fx:id="fourthYear" layoutX="180.0" layoutY="445.0" text="Label" />
-      <Label fx:id="thirdYear" layoutX="180.0" layoutY="337.0" text="Label" />
-      <Label fx:id="secondYear" layoutX="180.0" layoutY="234.0" text="Label" />
-      <Label fx:id="startYear" layoutX="180.0" layoutY="134.0" text="Label" />
-      <Label fx:id="courseTitle" layoutX="180.0" layoutY="28.0" text="Label">
+      <Label fx:id="courseTitle" layoutX="210.0" layoutY="14.0" text="&lt;Program name&gt;">
          <font>
             <Font size="21.0" />
          </font>
       </Label>
-      <Label layoutX="304.0" layoutY="71.0" text="Trimester 1" />
-      <Label layoutX="471.0" layoutY="73.0" text="Trimester 2" />
-      <Label layoutX="644.0" layoutY="73.0" text="Trimester 3" />
-      <Button fx:id="clear" layoutX="659.0" layoutY="31.0" mnemonicParsing="false" onAction="#clearTrimesters" text="Clear plan" />
+      <Label layoutX="360.0" layoutY="193.0" text="Trimester 1" />
+      <Label layoutX="559.0" layoutY="193.0" text="Trimester 2" />
+      <Label layoutX="751.0" layoutY="193.0" text="Trimester 3" />
+      <Label fx:id="startYear" layoutX="221.0" layoutY="263.0" text="&lt;startYear&gt;" />
+      <ListView fx:id="trimester1" layoutX="320.0" layoutY="221.0" prefHeight="81.0" prefWidth="152.0" />
+      <Label fx:id="secondYear" layoutX="221.0" layoutY="344.0" text="&lt;secondYear&gt;" />
+      <Label fx:id="thirdYear" layoutX="221.0" layoutY="433.0" text="&lt;thirdYear&gt;" />
+      <TextField fx:id="alertField" editable="false" layoutX="203.0" layoutY="623.0" prefHeight="25.0" prefWidth="670.0" text="Alert Field" />
+      <Button fx:id="recommend" layoutX="662.0" layoutY="584.0" mnemonicParsing="false" onAction="#recommendedPressed" text="Recommend plan" />
+      <Button fx:id="clear" layoutX="787.0" layoutY="584.0" mnemonicParsing="false" onAction="#clearTrimesters" text="Clear plan" />
+      <ProgressBar fx:id="unitProgressBar" layoutX="220.0" layoutY="155.0" prefHeight="18.0" prefWidth="522.0" progress="0.0" />
+      <Label fx:id="totalUnitLabel" layoutX="787.0" layoutY="145.0" text="0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <Label layoutX="750.0" layoutY="165.0" text="out of 144 UOC" />
+      <ProgressIndicator fx:id="businessCoreProgress" layoutX="292.0" layoutY="80.0" progress="0.0" />
+      <Label layoutX="267.0" layoutY="55.0" text="Business Cores" />
+      <Label layoutX="399.0" layoutY="55.0" text="IS Cores" />
+      <Label layoutX="489.0" layoutY="55.0" text="Prescribed Electives" />
+      <Label layoutX="624.0" layoutY="55.0" text="Free Electives" />
+      <Label layoutX="307.0" layoutY="128.0" text="/ 24 UOC" />
+      <ProgressIndicator fx:id="ISCoreProgress" layoutX="406.0" layoutY="80.0" progress="0.0" />
+      <ProgressIndicator fx:id="prescribedElectiveProgress" layoutX="524.0" layoutY="80.0" progress="0.0" />
+      <ProgressIndicator fx:id="freeElectiveProgress" layoutX="645.0" layoutY="80.0" progress="0.0" />
+      <Label layoutX="421.0" layoutY="128.0" text="/ 72 UOC" />
+      <Label layoutX="540.0" layoutY="128.0" text="/ 12 UOC" />
+      <Label fx:id="businessCoresLabel" layoutX="289.0" layoutY="126.0" text="0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <Label fx:id="ISCoresLabel" layoutX="402.0" layoutY="126.0" text="0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <Label fx:id="prescribedElectivesLabel" layoutX="524.0" layoutY="126.0" text="0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <Label layoutX="725.0" layoutY="55.0" text="General Education" />
+      <ProgressIndicator fx:id="generalEducationProgress" layoutX="757.0" layoutY="80.0" progress="0.0" />
+      <Label fx:id="freeElectivesLabel" layoutX="645.0" layoutY="126.0" text="0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <Label fx:id="generalEducationLabel" layoutX="757.0" layoutY="126.0" text="0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <Label layoutX="772.0" layoutY="128.0" text="/ 12 UOC" />
+      <Label layoutX="660.0" layoutY="128.0" text="/ 24 UOC" />
+      <ListView fx:id="trimester2" layoutX="513.0" layoutY="221.0" prefHeight="81.0" prefWidth="152.0" />
+      <ListView fx:id="trimester4" layoutX="320.0" layoutY="312.0" prefHeight="81.0" prefWidth="152.0" />
+      <ListView fx:id="trimester7" layoutX="320.0" layoutY="401.0" prefHeight="81.0" prefWidth="152.0" />
+      <ListView fx:id="trimester10" layoutX="320.0" layoutY="492.0" prefHeight="81.0" prefWidth="152.0" />
+      <ListView fx:id="trimester5" layoutX="513.0" layoutY="312.0" prefHeight="81.0" prefWidth="152.0" />
+      <ListView fx:id="trimester8" layoutX="513.0" layoutY="401.0" prefHeight="81.0" prefWidth="152.0" />
+      <ListView fx:id="trimester11" layoutX="513.0" layoutY="492.0" prefHeight="81.0" prefWidth="152.0" />
+      <ListView fx:id="trimester3" layoutX="705.0" layoutY="221.0" prefHeight="81.0" prefWidth="152.0" />
+      <ListView fx:id="trimester6" layoutX="705.0" layoutY="312.0" prefHeight="81.0" prefWidth="152.0" />
+      <ListView fx:id="trimester9" layoutX="705.0" layoutY="401.0" prefHeight="81.0" prefWidth="152.0" />
+      <ListView fx:id="trimester12" layoutX="705.0" layoutY="492.0" prefHeight="81.0" prefWidth="152.0" />
+      <Label fx:id="fourthYear" layoutX="221.0" layoutY="524.0" text="&lt;fourthYear&gt;" />
    </children>
 </AnchorPane>
