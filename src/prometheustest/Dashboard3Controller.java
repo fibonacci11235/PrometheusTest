@@ -24,10 +24,7 @@ public class Dashboard3Controller extends ParentDashboardController {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        //subjectList.getItems().addAll("INFS1602", "INFS1603", "INFS1609", "ACCT1501");
         
-        //fourthYear.setText(Integer.toString(currentUser.getStartingYear()+3));
-        //fifthYear.setText(Integer.toString(currentUser.getStartingYear()+4));
         
         
         
@@ -38,6 +35,7 @@ public class Dashboard3Controller extends ParentDashboardController {
         establishToolTip();
         establishToolTip2();
         establishToolTip3();
+        progressionWheelArrays();
     }
     
     @Override
@@ -71,6 +69,8 @@ public class Dashboard3Controller extends ParentDashboardController {
        trimester13.getItems().clear();
        trimester14.getItems().clear();
        trimester15.getItems().clear();
+       temporaryList.clear();
+       clearUnitProgress();
        super.establishList();
    }
    

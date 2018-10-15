@@ -8,7 +8,7 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="PrometheusTest.jar" size="171612" download="eager" />
+    <jar href="PrometheusTest.jar" size="177398" download="eager" />
     <jar href="lib\Enzo-0.3.6.jar" size="2504009" download="eager" />
     <jar href="lib\commons-lang3-3.1.jar" size="315805" download="eager" />
     <jar href="lib\derby.jar" size="3104883" download="eager" />

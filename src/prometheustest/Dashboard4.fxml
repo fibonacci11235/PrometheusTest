@@ -13,9 +13,9 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="719.0" prefWidth="1066.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="prometheustest.Dashboard2Controller">
+<AnchorPane id="AnchorPane" prefHeight="719.0" prefWidth="1066.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="prometheustest.Dashboard4Controller">
    <children>
-      <ImageView fitHeight="719.0" fitWidth="1066.0" opacity="0.45">
+      <ImageView fitHeight="719.0" fitWidth="1100.0" opacity="0.45">
          <image>
             <Image url="file:/C:/Users/josiah/Downloads/43597897_1410522009080815_6403105710674018304_n.jpg" />
          </image>
@@ -67,27 +67,27 @@
       <TextField fx:id="alertField" editable="false" layoutX="230.0" layoutY="681.0" prefHeight="25.0" prefWidth="775.0" text="Alert Field" />
       <JFXProgressBar fx:id="unitProgressBar" layoutX="275.0" layoutY="229.0" prefHeight="2.0" prefWidth="684.0" progress="0.0" stylesheets="file:/C:/Users/josiah/Documents/NetBeansProjects/PrometheusTest/src/prometheustest/main.css" />
       <JFXButton fx:id="clear" buttonType="RAISED" layoutX="918.0" layoutY="643.0" onAction="#clearTrimesters" style="-fx-background-color: black;" text="CLEAR PLAN" textFill="WHITE" />
-      <JFXButton fx:id="businessCoresButton" layoutX="272.0" layoutY="55.0" onAction="#businessCoresPressed" text="Business Cores">
+      <JFXButton fx:id="businessCores2Button" layoutX="255.0" layoutY="54.0" onAction="#businessCores2Pressed" text="Business Cores">
          <font>
             <Font size="13.0" />
          </font>
       </JFXButton>
-      <JFXButton fx:id="ISCoresButton" layoutX="434.0" layoutY="54.0" onAction="#ISCoresPressed" text="IS Cores">
+      <JFXButton fx:id="ISCoresButton" layoutX="535.0" layoutY="54.0" onAction="#ISCoresPressed" text="IS Cores">
          <font>
             <Font size="13.0" />
          </font>
       </JFXButton>
-      <JFXButton fx:id="prescribedElectivesButton" layoutX="549.0" layoutY="54.0" onAction="#prescribedElectivesPressed" text="Prescribed Electives">
+      <JFXButton fx:id="flexibleCoresButton" layoutX="392.0" layoutY="54.0" onAction="#flexibleCoresPressed" text="Flexible Cores">
          <font>
             <Font size="13.0" />
          </font>
       </JFXButton>
-      <JFXButton fx:id="freeElectivesButton" layoutX="714.0" layoutY="54.0" onAction="#freeElectivesPressed" text="Free Electives">
+      <JFXButton fx:id="businessElectivesButton" layoutX="760.0" layoutY="54.0" onAction="#businessElectivesPressed" text="Business Electives">
          <font>
             <Font size="13.0" />
          </font>
       </JFXButton>
-      <JFXButton fx:id="generalEducationButton" layoutX="836.0" layoutY="54.0" onAction="#generalEducationPressed" text="General Education">
+      <JFXButton fx:id="generalEducationButton" layoutX="879.0" layoutY="54.0" onAction="#generalEducationPressed" text="General Education">
          <font>
             <Font size="13.0" />
          </font>
@@ -97,12 +97,12 @@
       <JFXButton fx:id="courseSearchButton" buttonType="RAISED" layoutX="30.0" layoutY="83.0" onAction="#searchPressed" prefHeight="25.0" prefWidth="159.0" style="-fx-background-color: black;" text="SEARCH" textFill="WHITE" />
       <JFXButton fx:id="webLinkButton" buttonType="RAISED" layoutX="29.0" layoutY="594.0" onAction="#loadWebLink" prefHeight="25.0" prefWidth="159.0" style="-fx-background-color: black;" text="HANDBOOK PAGE LINK" textFill="WHITE" />
       <JFXButton fx:id="backButton" buttonType="RAISED" layoutX="30.0" layoutY="630.0" onAction="#backPressed" prefHeight="25.0" prefWidth="159.0" style="-fx-background-color: black;" text="BACK" textFill="WHITE" />
-      <FlatGauge fx:id="businessCoresGauge" layoutX="245.0" layoutY="84.0" maxValue="24.0" prefHeight="117.0" prefWidth="150.0" style="-bar-color: dodgerblue;" unit="/ 24 UOC" />
-      <FlatGauge fx:id="ISCoresGauge" layoutX="392.0" layoutY="85.0" maxValue="72.0" prefHeight="117.0" prefWidth="150.0" style="-bar-color: dodgerblue;" unit="/ 72 UOC" />
-      <FlatGauge fx:id="prescribedElectivesGauge" layoutX="540.0" layoutY="85.0" maxValue="12.0" prefHeight="117.0" prefWidth="150.0" style="-bar-color: dodgerblue;" unit="/ 12 UOC" />
-      <FlatGauge fx:id="freeElectivesGauge" layoutX="679.0" layoutY="85.0" maxValue="24.0" prefHeight="117.0" prefWidth="150.0" style="-bar-color: dodgerblue;" unit="/ 24 UOC" />
-      <FlatGauge fx:id="generalEducationGauge" layoutX="821.0" layoutY="85.0" maxValue="12.0" prefHeight="117.0" prefWidth="150.0" style="-bar-color: dodgerblue;" unit="/ 12 UOC" />
-      <Label layoutX="614.0" layoutY="210.0" text="/ 144 Total UOC">
+      <FlatGauge fx:id="businessCores2Gauge" layoutX="245.0" layoutY="85.0" maxValue="24.0" prefHeight="108.0" prefWidth="123.0" style="-bar-color: dodgerblue;" unit="/ 24 UOC" />
+      <FlatGauge fx:id="ISCoresGauge" layoutX="506.0" layoutY="85.0" maxValue="72.0" prefHeight="108.0" prefWidth="123.0" style="-bar-color: dodgerblue;" unit="/ 72 UOC" />
+      <FlatGauge fx:id="flexibleCoresGauge" layoutX="375.0" layoutY="85.0" maxValue="24.0" prefHeight="108.0" prefWidth="132.0" style="-bar-color: dodgerblue;" unit="/ 24 UOC" />
+      <FlatGauge fx:id="businessElectivesGauge" layoutX="758.0" layoutY="85.0" maxValue="30.0" prefHeight="108.0" prefWidth="123.0" style="-bar-color: dodgerblue;" unit="/ 30 UOC" />
+      <FlatGauge fx:id="generalEducationGauge" layoutX="881.0" layoutY="85.0" maxValue="12.0" prefHeight="108.0" prefWidth="119.0" style="-bar-color: dodgerblue;" unit="/ 12 UOC" />
+      <Label layoutX="614.0" layoutY="210.0" text="/ 192 Total UOC">
          <font>
             <Font size="13.0" />
          </font>
@@ -121,6 +121,11 @@
             <Font name="System Bold" size="12.0" />
          </font>
       </Label>
-      <JFXButton fx:id="savePlan" buttonType="RAISED" disable="true" layoutX="832.0" layoutY="643.0" onAction="#saveImage" style="-fx-background-color: black;" text="SAVE PLAN" textFill="WHITE" />
+      <FlatGauge layoutX="635.0" layoutY="85.0" maxValue="30.0" prefHeight="108.0" prefWidth="123.0" style="-bar-color: dodgerblue;" unit="/ 30 UOC" />
+      <JFXButton layoutX="638.0" layoutY="54.0" text="Commerce Major">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </JFXButton>
    </children>
 </AnchorPane>

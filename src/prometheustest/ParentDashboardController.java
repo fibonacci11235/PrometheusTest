@@ -7,14 +7,19 @@ package prometheustest;
 
 import com.jfoenix.controls.*;
 import eu.hansolo.enzo.gauge.FlatGauge;
+import java.awt.AWTException;
 
 import java.awt.Desktop;
+
+
+import java.awt.Robot;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -24,41 +29,45 @@ import javafx.collections.ObservableList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javafx.beans.binding.Bindings;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.paint.Color;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import javax.imageio.ImageIO;
 /**
  *
  * @author josiah
  */
 public abstract class ParentDashboardController implements Initializable {
     public UserProfile currentUser;
+    private Stage stage;
     
+  
     @FXML
     public Label courseTitle;
     @FXML
@@ -71,6 +80,8 @@ public abstract class ParentDashboardController implements Initializable {
     public JFXButton clear;
     @FXML
     public JFXButton webLinkButton;
+    @FXML
+    public JFXButton savePlan;
     @FXML
     public ListView subjectList;
     @FXML
@@ -119,8 +130,8 @@ public abstract class ParentDashboardController implements Initializable {
     
     
     
-    private String trimesterOffering;
-    private String subjectOffered;
+    public String trimesterOffering;
+    public String subjectOffered;
     
     
     
@@ -133,8 +144,8 @@ public abstract class ParentDashboardController implements Initializable {
     // Progress bar
     @FXML
     public Label totalUnitLabel;
-    private int tempUnits;
-    private int totalUnits = 0;
+    public int tempUnits;
+    public int totalUnits = 0;
     
     @FXML
     public JFXProgressBar unitProgressBar; 
@@ -142,7 +153,7 @@ public abstract class ParentDashboardController implements Initializable {
     //Temporary Variables 
     List<String> temporaryList = new ArrayList<>();
     public String tempSubject;
-    private int dragUnits;
+    public int dragUnits;
     public String tempPrerequisites;
     public String listViewSource;
     public String tempFaculty;
@@ -150,6 +161,7 @@ public abstract class ParentDashboardController implements Initializable {
     
     //ProgressionWheelArrays
     List<String> businessCores = new ArrayList<>();
+    List<String> businessCores2 = new ArrayList<>();
     List<String> informationSystemsCores = new ArrayList<>();
     List<String> prescribedElectives = new ArrayList<>();
     List<String> flexibleCores = new ArrayList<>();
@@ -159,12 +171,14 @@ public abstract class ParentDashboardController implements Initializable {
     
     
     
-    private int businessCoresUnits = 0;
-    private int ISCoresUnits = 0;
-    private int prescribedElectivesUnits = 0; 
-    private int freeElectivesUnits = 0;
-    private int generalEducationUnits = 0;
-    
+    public int businessCoresUnits = 0;
+    public int ISCoresUnits = 0;
+    public int prescribedElectivesUnits = 0; 
+    public int freeElectivesUnits = 0;
+    public int generalEducationUnits = 0;
+    public int businessCores2Units = 0;
+    public int flexibleCoresUnits = 0;
+    public int businessElectivesUnits = 0;
     
     @FXML
     public JFXButton businessCoresButton;
@@ -176,6 +190,12 @@ public abstract class ParentDashboardController implements Initializable {
     public JFXButton freeElectivesButton;
     @FXML
     public JFXButton generalEducationButton;
+    @FXML
+    public JFXButton businessCores2Button;
+    @FXML
+    public JFXButton flexibleCoresButton;
+    @FXML
+    public JFXButton businessElectivesButton;
     
     @FXML
     public FlatGauge businessCoresGauge; 
@@ -187,7 +207,17 @@ public abstract class ParentDashboardController implements Initializable {
     public FlatGauge freeElectivesGauge;
     @FXML
     public FlatGauge generalEducationGauge;
-         
+    @FXML
+    public FlatGauge businessCores2Gauge;
+    @FXML
+    public FlatGauge flexibleCoresGauge;
+    @FXML
+    public FlatGauge businessElectivesGauge;
+    
+    @FXML
+    public Rectangle snapshotRectangle;
+    @FXML
+    public AnchorPane anchorPane;
     
     
     //Subjects
@@ -365,6 +395,8 @@ public abstract class ParentDashboardController implements Initializable {
             alert("Adding subject will exceed maximum trimester load of 18 UOC.");
             listView.getSelectionModel().clearSelection();
             subjectList.getSelectionModel().clearSelection();
+            tempSubject = null;
+            tempUnits = 0;
             dragCompleted = false;
         }
         else if (listView == subjectList) {
@@ -372,6 +404,8 @@ public abstract class ParentDashboardController implements Initializable {
         }
         else if (temporaryList.contains(tempSubject)) {
             alert("Subject already contained within plan.");
+            tempSubject = null;
+            tempUnits = 0;
             dragCompleted = false;
         }
         else if (prerequisiteCheck() == false) {
@@ -665,6 +699,7 @@ public abstract class ParentDashboardController implements Initializable {
         trimester9.getItems().clear();
         temporaryList.clear();
         clearUnitProgress();
+        savePlan.setDisable(true);
         establishList();
    }
    
@@ -704,6 +739,9 @@ public abstract class ParentDashboardController implements Initializable {
        double progress = x/144;
        unitProgressBar.setProgress(progress);
        tempUnits = 0;
+       if (totalUnits == 144) {
+           savePlan.setDisable(false);
+       }
    }
    
    public boolean trimesterOfferingCheck(ListView<Subject> listView) {
@@ -833,6 +871,12 @@ public abstract class ParentDashboardController implements Initializable {
         flexibleCores.add("MGMT1101");
         flexibleCores.add("TABL1710");
         
+        businessCores2.add("ACCT1501");
+        businessCores2.add("ECON1101");
+        businessCores2.add("MGMT1001");
+        businessCores2.add("ECON1203");
+        businessCores2.add("MATH1041");
+        
    }
    
    public void progressionWheelIncrement() {
@@ -877,7 +921,7 @@ public abstract class ParentDashboardController implements Initializable {
             
        }
    }
-       
+  
    
    public void establishToolTip() {
        
@@ -1380,6 +1424,57 @@ public abstract class ParentDashboardController implements Initializable {
        subjectList.getItems().clear();
         establishList();
         this.sql = "Select * From COURSE ORDER BY COURSE_CODE";
+   }
+   
+   @FXML
+   public void businessCores2Pressed() throws ClassNotFoundException, SQLException {
+       this.sql = "SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'ACCT1501' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'MGMT1001' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'ECON1203' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'MATH1041' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'ECON1101'";
+        subjectList.getItems().clear();
+        establishList();
+        this.sql = "Select * From COURSE ORDER BY COURSE_CODE";
+   }
+   
+   @FXML
+   public void flexibleCoresPressed() throws ClassNotFoundException, SQLException {
+       this.sql = "SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'ACCT1511' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'COMM1000' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'ECON1102' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'FINS1613' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'MARK1012' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'MGMT1101' UNION "
+                 +"SELECT DISTINCT * from COURSE WHERE COURSE_CODE = 'TABL1710'";
+        subjectList.getItems().clear();
+        establishList();
+        this.sql = "Select * From COURSE ORDER BY COURSE_CODE";
+   }
+   
+   @FXML
+   public void businessElectivesPressed() {
+       
+   }
+   
+//   @FXML
+//   public void saveImage() throws IOException {
+//        try {
+//            Robot robot = new Robot();
+//            Rectangle rectangle = new Rectangle(0, 0, 800, 410);
+//            BufferedImage image = robot.createScreenCapture(rectangle);
+//            FileChooser fileChooser = new FileChooser();
+//            ImageIO.write(image, "png", fileChooser.showSaveDialog(stage));
+//        } catch (AWTException ex) {
+//            Logger.getLogger(ParentDashboardController.class.getName()).log(Level.SEVERE, null, ex);
+//        } 
+//   }
+   
+   @FXML
+   public void saveImage() throws IOException {
+        WritableImage image = anchorPane.snapshot(new SnapshotParameters(), null);
+        FileChooser fileChooser = new FileChooser();
+        ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", fileChooser.showSaveDialog(stage));
    }
 }
 

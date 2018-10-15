@@ -61,50 +61,57 @@ public class LandingController implements Initializable {
         
        
         FXMLLoader loader = new FXMLLoader();
-        switch (duration) {
-            case "3 years":
-                resource = "Dashboard1.fxml";
-                loader.setLocation(getClass().getResource(resource));
-                Parent dashboard1Parent = loader.load();
-                Scene dashboard1Scene = new Scene(dashboard1Parent);
-                Dashboard1Controller controller = loader.getController();
-                controller.initData(profile);
-                Stage window = (Stage)((Node)event.getSource()).getScene().getWindow();
-                window.setScene(dashboard1Scene);
-                window.show();
-                break;
-            case "4 years":
-                resource = "Dashboard2.fxml";
-                loader.setLocation(getClass().getResource(resource));
-                Parent dashboard2Parent = loader.load();
-                Scene dashboard2Scene = new Scene(dashboard2Parent);
-                Dashboard2Controller controller2 = loader.getController();
-                controller2.initData(profile);
-                Stage window2 = (Stage)((Node)event.getSource()).getScene().getWindow();
-                window2.setScene(dashboard2Scene);
-                window2.show();
-                break;
-            case "5 years":
-                resource = "Dashboard3.fxml";
-                loader.setLocation(getClass().getResource(resource));
-                Parent dashboard3Parent = loader.load();
-                Scene dashboard3Scene = new Scene(dashboard3Parent);
-                Dashboard3Controller controller3 = loader.getController();
-                controller3.initData(profile);
-                Stage window3 = (Stage)((Node)event.getSource()).getScene().getWindow();
-                window3.setScene(dashboard3Scene);
-                window3.show();
-                break;
-            default:
-                break;
+        
+        if ("3979 - Information Systems".equals(course) && "3 years".equals(duration)) {
+            resource = "Dashboard1.fxml";
+            loader.setLocation(getClass().getResource(resource));
+            Parent dashboard1Parent = loader.load();
+            Scene dashboard1Scene = new Scene(dashboard1Parent);
+            Dashboard1Controller controller = loader.getController();
+            controller.initData(profile);
+            Stage window = (Stage)((Node)event.getSource()).getScene().getWindow();
+            window.setScene(dashboard1Scene);
+            window.show();
         }
+        else if ("3979 - Information Systems".equals(course) && "4 years".equals(duration)) {
+            resource = "Dashboard2.fxml";
+            loader.setLocation(getClass().getResource(resource));
+            Parent dashboard2Parent = loader.load();
+            Scene dashboard2Scene = new Scene(dashboard2Parent);
+            Dashboard2Controller controller2 = loader.getController();
+            controller2.initData(profile);
+            Stage window2 = (Stage)((Node)event.getSource()).getScene().getWindow();
+            window2.setScene(dashboard2Scene);
+            window2.show();
+        }
+        else if ("3979 - Information Systems".equals(course) && "5 years".equals(duration)) {
+            resource = "Dashboard3.fxml";
+            loader.setLocation(getClass().getResource(resource));
+            Parent dashboard3Parent = loader.load();
+            Scene dashboard3Scene = new Scene(dashboard3Parent);
+            Dashboard3Controller controller3 = loader.getController();
+            controller3.initData(profile);
+            Stage window3 = (Stage)((Node)event.getSource()).getScene().getWindow();
+            window3.setScene(dashboard3Scene);
+            window3.show();
+        }
+        else if ("3584 - Commerce / Information Systems".equals(course) && "4 years".equals(duration)) {
+            resource = "Dashboard4.fxml";
+            loader.setLocation(getClass().getResource(resource));
+            Parent dashboard4Parent = loader.load();
+            Scene dashboard4Scene = new Scene(dashboard4Parent);
+            Dashboard4Controller controller4 = loader.getController();
+            controller4.initData(profile);
+            Stage window4 = (Stage)((Node)event.getSource()).getScene().getWindow();
+            window4.setScene(dashboard4Scene);
+            window4.show();
         
-       
+        }
+        else if ("3584 - Commerce / Information Systems".equals(course) && "5 years".equals(duration)) {
+            
         
-
+        }           
         
-        
-
     }
 
 }

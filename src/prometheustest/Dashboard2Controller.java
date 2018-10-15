@@ -69,6 +69,8 @@ public class Dashboard2Controller extends ParentDashboardController {
        trimester10.getItems().clear();
        trimester11.getItems().clear();
        trimester12.getItems().clear();
+       temporaryList.clear();
+       clearUnitProgress();
        super.establishList();
    }
     
